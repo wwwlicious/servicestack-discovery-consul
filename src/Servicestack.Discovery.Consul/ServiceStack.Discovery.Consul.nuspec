@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>ServiceStack.Discovery.Consul</id>
+    <version>$version$</version>
+    <authors>Scott Mackay (@wwwlicious)</authors>
+    <description>ServiceStack plugin that supports service discovery and request uri resolution using Consul</description>
+    <projectUrl>https://github.com/wwwlicious/servicestack-discovery-consul</projectUrl>
+    <licenseUrl>https://opensource.org/licenses/MPL-2.0</licenseUrl>
+    <iconUrl>https://servicestack.net/img/logo-32.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <tags>servicestack plugin discovery servicediscovery microservices consul</tags>
+    <releaseNotes>See changelog for details</releaseNotes>
+    <dependencies>
+      <dependency id="ServiceStack" version="[4, 5)" />
+      <dependency id="ServiceStack.Common" version="[4, 5)" />
+      <dependency id="ServiceStack.Text" version="[4, 5)" />
+      <dependency id="ServiceStack.Text" version="[4, 5)" />
+    </dependencies>
+  </metadata>
+</package>
