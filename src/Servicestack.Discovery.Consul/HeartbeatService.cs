@@ -13,6 +13,7 @@ namespace ServiceStack.Discovery.Consul
     /// This service creates a simple heartbeat endpoint
     /// </summary>
     /// <remarks>The heartbeat is executed when this service is registed to obtain the baseUrl</remarks>
+    [Exclude(Feature.Metadata)]
     public class HeartbeatService : Service
     {
         public Heartbeat Any(Heartbeat heartbeat)
@@ -21,14 +22,13 @@ namespace ServiceStack.Discovery.Consul
             heartbeat.Url = Request.GetBaseUrl();
             return heartbeat;
         }
+    }
 
-        [Route("/heartbeat", "GET")]
-        [Exclude(Feature.None)]
-        public class Heartbeat
-        {
-            public string Url { get; set; }
+    [Exclude(Feature.Metadata)]
+    public class Heartbeat
+    {
+        public string Url { get; set; }
 
-            public int StatusCode { get; set; }
-        }
+        public int StatusCode { get; set; }
     }
 }

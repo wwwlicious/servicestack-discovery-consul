@@ -2,15 +2,13 @@
 
 A plugin for ServiceStack that registers and deregisters Services with [Consul.io](http://consul.io)
 
-##Requirements
+## Requirements
 
 A consul agent must be running on the same machine as the AppHost.
 
-##Getting started
+## Quick Start
 
-1. Get consul.exe
-2. Run consul.exe agent -dev
-3. Add the plugin to your app host
+Add the following to your AppHost, WebHostUrl and the Plugin
 
 ```csharp
 public override void Configure(Container container)
@@ -21,6 +19,25 @@ public override void Configure(Container container)
     });
 
     Plugins.Add(new ConsulFeature(this));
+}
+```
+Pass the resolver the DTO from an external service using the plugin.
+and an empty client, the client will find the correct service url or return null
+if no clients are 
+
+```csharp
+var client = new JsonServiceClient().TryGetClientFor<ExternalDTO>();
+var response = client.Send(new ExternalDTO { Custom = "bob" });
+```
+
+*NB This plugin relies on [reverse routing](https://github.com/ServiceStack/ServiceStack/wiki/Routing#reverse-routing) in ServiceStack which requires your requests to have the 
+`RouteAttribute` e.g.
+
+```csharp
+[Route("Some/Route/{custom}")]
+public class ExternalDTO 
+{
+    public string Custom { get; set; }
 }
 ```
 
@@ -38,10 +55,10 @@ consul agent -dev -advertise=127.0.0.1
 
 This will give you a single server Consul cluster, this is not recommended for production usage, but it will allow you to use service discovery on your dev machine.
 
-You should now be able to view the Consul UI @ [http://127.0.0.1:8500/ui](http://127.0.0.1:8500/UI)
+You should now be able to view the Consul UI @ [http://127.0.0.1:8500/UI](http://127.0.0.1:8500/UI)
 
 
-## Service Registration
+### Service Registration
 When an AppHost starts, the plugin will register the service with Consul agent. 
 
 When the AppHost is shutdown, it will deregister the service.
@@ -51,7 +68,7 @@ The default health checks will create an endpoint in your service [http://locaho
 
 If redis has been configured in the apphost, it will also check it's availability.
 
-## Extending health checks
+### Extending health checks
 
 You can add your own health checks
 
@@ -61,7 +78,7 @@ using ConsulFeature(this, new AgentServiceCheck());
 or
 to turn off these defaults, set the ConsulFeature(this) { IncludeDefaultServiceHealth = false }
 
-## Discovery
+### Discovery
 The aim to enable discovery of a service by it's RequestDTO's
 
   

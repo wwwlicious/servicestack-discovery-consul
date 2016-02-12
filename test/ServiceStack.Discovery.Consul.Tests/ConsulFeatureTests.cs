@@ -17,7 +17,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         [Fact]
         public void Config_WebHostUrl_ThrowsException_IfNotSet()
         {
-            Action action = () => new ConsulFeature(new BasicAppHost());
+            Action action = () => new ConsulFeature().Register(new BasicAppHost());
             action.ShouldThrow<ApplicationException>().Which.Message.Should().Be("appHost.Config.WebHostUrl must be set to use the Consul plugin so that the service can sent it's full http://url:port to Consul");
         }
 
@@ -26,9 +26,35 @@ namespace ServiceStack.Discovery.Consul.Tests
         {
             var host = new BasicAppHost { Config = new HostConfig { WebHostUrl = "http://localhost" } };
 
-            var plugin = new ConsulFeature(host);
+            var plugin = new ConsulFeature();
 
             plugin.ServiceChecks.Should().BeEmpty();
-        } 
+        }
+
+        [Fact]
+        public void FactMethodName()
+        {
+            var serviceClient = new JsonServiceClient();
+            var response = serviceClient.Send(new ExternalDTO(), true);
+        }
+
+        [Route("/external/Dto")]
+        public class ExternalDTO : IReturn<ExternalDTO>
+        {
+        }
+    }
+
+    public static class ServiceClientConsulExtensions
+    {
+        public static TResponse Send<TResponse>(this ServiceClientBase client, IReturn<TResponse> request, bool test)
+        {
+            var type = request.GetType();
+            return client.TryGetClientFor(type).Send<TResponse>((object)request);
+        }
+
+        public static void Send(this ServiceClientBase client, IReturnVoid request)
+        {
+            client.SendOneWay((object)request);
+        }
     }
 }

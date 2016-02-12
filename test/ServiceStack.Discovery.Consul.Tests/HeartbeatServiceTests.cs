@@ -34,19 +34,19 @@ namespace ServiceStack.Discovery.Consul.Tests
         [Fact]
         public void Heartbeat_Status_Is_Empty()
         {
-            new HeartbeatService.Heartbeat().StatusCode.Should().Be(0);
+            new Heartbeat().StatusCode.Should().Be(0);
         }
 
         [Fact]
         public void Heartbeat_Url_Is_Empty()
         {
-            new HeartbeatService.Heartbeat().Url.Should().BeNullOrWhiteSpace();
+            new Heartbeat().Url.Should().BeNullOrWhiteSpace();
         }
 
         [Fact]
         public void Heartbeat_Should_Return_200()
         {
-            var req = new HeartbeatService.Heartbeat();
+            var req = new Heartbeat();
 
             var res = service.Any(req);
 
@@ -56,7 +56,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         [Fact]
         public void Heartbeat_Should_Return_Url()
         {
-            var req = new HeartbeatService.Heartbeat();
+            var req = new Heartbeat();
 
             var res = service.Any(req);
 
