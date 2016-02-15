@@ -6,13 +6,14 @@ namespace TestServiceA
 {
     using ServiceStack;
 
-    public partial class EchoA
-        : IReturn<EchoAReply>
+    [Route("/echo/b", "POST")]
+    public partial class EchoB
+        : IReturn<EchoBReply>
     {
         public virtual bool CallRemoteService { get; set; }
     }
 
-    public partial class EchoAReply
+    public partial class EchoBReply
     {
         public virtual string Message { get; set; }
     }

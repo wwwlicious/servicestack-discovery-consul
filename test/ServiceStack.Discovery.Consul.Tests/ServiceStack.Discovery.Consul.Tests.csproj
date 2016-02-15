@@ -89,7 +89,7 @@
   <ItemGroup>
     <Compile Include="ConsulFeatureTests.cs" />
     <Compile Include="ConsulRegisterCheckTests.cs" />
-    <Compile Include="ConsulRegisterServiceTests.cs" />
+    <Compile Include="ConsulServiceRegistrationTests.cs" />
     <Compile Include="HeartbeatServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -102,9 +102,7 @@
       <Name>ServiceStack.Discovery.Consul</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Consul\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

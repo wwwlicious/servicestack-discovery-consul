@@ -1,9 +1,9 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace ServiceStack.Discovery.Consul
 {
-    using System;
     using System.Runtime.Serialization;
-
-    using ServiceStack.FluentValidation;
 
     [Route("/v1/agent/check/register", "PUT")]
     public class ConsulRegisterCheck : IUrlFilter
@@ -24,7 +24,7 @@ namespace ServiceStack.Discovery.Consul
         /// <summary>
         /// The name of the agent check
         /// </summary>
-        public string Name { get; }
+        public string Name { get; private set; }
 
         /// <summary>
         /// The service name to associate the check with, leave blank for agent check
@@ -60,33 +60,6 @@ namespace ServiceStack.Discovery.Consul
         public string ToUrl(string absoluteUrl)
         {
             return string.IsNullOrWhiteSpace(AclToken) ? absoluteUrl : absoluteUrl.AddQueryParam("token", AclToken);
-        }
-    }
-
-    public class ConsulRegisterCheckValidator : AbstractValidator<ConsulRegisterCheck>
-    {
-        public ConsulRegisterCheckValidator()
-        {
-            RuleFor(x => x.Name).NotEmpty();
-
-            // at least one out of http, script, tcp must be specified
-            RuleFor(x => x.HTTP)
-                .NotEmpty()
-                .WithName("Method")
-                .WithMessage("One of Http, Script or Tcp must be defined")
-                .Unless(x => !x.Script.IsNullOrEmpty() || !x.TCP.IsNullOrEmpty());
-
-            // if script, http or tcp is set, interval is required
-            RuleFor(x => x.IntervalInSeconds)
-                .NotEmpty()
-                .GreaterThan(0)
-                .When(
-                    x =>
-                    !x.HTTP.IsNullOrEmpty() || !x.TCP.IsNullOrEmpty() || !x.Script.IsNullOrEmpty());
-
-            // If docker container id is provided, script is evaluated using the specified shell
-            RuleFor(x => x.Shell).NotEmpty().When(x => !x.DockerContainerID.IsNullOrEmpty());
-
         }
     }
 }

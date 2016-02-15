@@ -1,6 +1,6 @@
 # ServiceStack.Discovery.Consul
 
-A plugin for ServiceStack that registers and deregisters Services with [Consul.io](http://consul.io)
+A plugin for ServiceStack that registers and deregisters Services with [Consul.io](http://consul.io) and provides RequestDTO service discovery
 
 ## Requirements
 
@@ -30,45 +30,44 @@ var client = new JsonServiceClient().TryGetClientFor<ExternalDTO>();
 var response = client.Send(new ExternalDTO { Custom = "bob" });
 ```
 
-*NB This plugin relies on [reverse routing](https://github.com/ServiceStack/ServiceStack/wiki/Routing#reverse-routing) in ServiceStack which requires your requests to have the 
-`RouteAttribute` e.g.
-
-```csharp
-[Route("Some/Route/{custom}")]
-public class ExternalDTO 
-{
-    public string Custom { get; set; }
-}
-```
-
 ## Running your services
 
-Before you start your services, make sure you have an active cluster running on the host machine.
+Before you start your services, you'll need to [download consul](https://www.consul.io/) and start the agent running on your machine.
 
-#### Consul Cluster
 
-If you are new to Consul, you can bootstrap your test environment using this command to create an in-memory server agent:
+The following will create an in-memory instance which is useful for testing
 
-```bat
-consul agent -dev -advertise=127.0.0.1
+```shell
+
+consul.exe agent -dev -advertise=127.0.0.1
+
 ```
 
-This will give you a single server Consul cluster, this is not recommended for production usage, but it will allow you to use service discovery on your dev machine.
+You should now be able to view the [Consul UI](http://127.0.0.1:8500/ui)
 
-You should now be able to view the Consul UI @ [http://127.0.0.1:8500/UI](http://127.0.0.1:8500/UI)
-
+Once you have added the plugin to your ServiceStack AppHost, you should see it appear
+in the Consol UI when you start it.
 
 ### Service Registration
-When an AppHost starts, the plugin will register the service with Consul agent. 
 
+The plugin will register the service with a Consul agent. 
 When the AppHost is shutdown, it will deregister the service.
 
-### Health checks
-The default health checks will create an endpoint in your service [http://locahost:1234/heartbeat](http://locahost:1234/heartbeat)
+#### Health checks
 
-If redis has been configured in the apphost, it will also check it's availability.
+Each service can have a number of health checks.  
 
-### Extending health checks
+By default the plugin creates 2 health checks
+
+1. Heartbeat : Creates an endpoint in your service [http://locahost:1234/reply/json/heartbeat](http://locahost:1234/reply/json/heartbeat) that expects a 200 response
+2. If Redis has been configured in the AppHost, it will check Redis is responding
+
+To turn off the default checks use the following:+1:
+```csharp
+Plugins.Add(new ConsulFeature(this) { IncludeDefaultServiceHealth = false });
+```
+
+#### Custom health checks
 
 You can add your own health checks
 
@@ -79,6 +78,19 @@ or
 to turn off these defaults, set the ConsulFeature(this) { IncludeDefaultServiceHealth = false }
 
 ### Discovery
-The aim to enable discovery of a service by it's RequestDTO's
+
+The default discovery mechanism uses the RequestDTO type names to resolve the services capable of processing the request.
+This means that you should always use unique names across all your services for each of your RequestDTO's
+
+To resolve the correct service use the following client extension
+
+```csharp
+var client = new JsonServiceClient().TryGetClientFor<ExternalDTO>();
+var result = client.Send(new ExternalDTO());
+```
+
+
+ 
+
 
   

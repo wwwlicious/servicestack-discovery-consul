@@ -59,11 +59,17 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Checks\Heartbeat.cs" />
+    <Compile Include="Checks\HeartbeatService.cs" />
     <Compile Include="ConsulFeature.cs" />
     <Compile Include="Consul\ConsulRegisterCheck.cs" />
-    <Compile Include="Consul\ConsulRegisterService.cs" />
-    <Compile Include="DefaultRequestTypeDiscoveryStrategy.cs" />
-    <Compile Include="HeartbeatService.cs" />
+    <Compile Include="Consul\ConsulRegisterCheckValidator.cs" />
+    <Compile Include="Consul\ConsulRegisterServiceValidator.cs" />
+    <Compile Include="Consul\ConsulServiceRegistration.cs" />
+    <Compile Include="Consul\ConsulServiceResponse.cs" />
+    <Compile Include="Consul\ConsulUris.cs" />
+    <Compile Include="Discovery\DefaultDiscoveryRequestTypeResolver.cs" />
+    <Compile Include="Discovery\IDiscoveryRequestTypeResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ConsulClient.cs" />
   </ItemGroup>

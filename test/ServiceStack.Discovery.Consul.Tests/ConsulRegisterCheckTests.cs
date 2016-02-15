@@ -1,15 +1,11 @@
 ﻿// This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
 namespace ServiceStack.Discovery.Consul.Tests
 {
-    using System;
-
     using FluentAssertions;
 
     using ServiceStack.FluentValidation.TestHelper;
-    using ServiceStack.Text;
 
     using Xunit;
 
@@ -40,19 +36,19 @@ namespace ServiceStack.Discovery.Consul.Tests
         [Fact]
         public void Interval_Is_Required_When_Tcp_Is_Specified()
         {
-            validator.ShouldHaveValidationErrorFor(x => x.Interval, new ConsulRegisterCheck("a") { TCP = "a" });
+            validator.ShouldHaveValidationErrorFor(x => x.IntervalInSeconds, new ConsulRegisterCheck("a") { TCP = "a" });
         }
 
         [Fact]
         public void Interval_Is_Required_When_Http_Is_Specified()
         {
-            validator.ShouldHaveValidationErrorFor(x => x.Interval, new ConsulRegisterCheck("a") { HTTP = "a" });
+            validator.ShouldHaveValidationErrorFor(x => x.IntervalInSeconds, new ConsulRegisterCheck("a") { HTTP = "a" });
         }
 
         [Fact]
         public void Interval_Is_Required_When_Script_Is_Specified()
         {
-            validator.ShouldHaveValidationErrorFor(x => x.Interval, new ConsulRegisterCheck("a") { Script = "a" });
+            validator.ShouldHaveValidationErrorFor(x => x.IntervalInSeconds, new ConsulRegisterCheck("a") { Script = "a" });
         }
 
         [Theory]
@@ -60,7 +56,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         [InlineData(-1)]
         public void Interval_Must_Be_Greater_Than_Zero_If_Specified(int seconds)
         {
-            validator.ShouldHaveValidationErrorFor(x => x.Interval, new ConsulRegisterCheck("a") { Script = "a", IntervalInSeconds = seconds });
+            validator.ShouldHaveValidationErrorFor(x => x.IntervalInSeconds, new ConsulRegisterCheck("a") { Script = "a", IntervalInSeconds = seconds });
         }
 
         [Fact]

@@ -1,7 +1,9 @@
-﻿using System;
-
+﻿// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace TestServiceA
 {
+    using System;
     using System.Diagnostics;
     using Funq;
     using ServiceStack;
@@ -39,7 +41,7 @@ namespace TestServiceA
                 ApiVersion = "2.0"
             });
 
-            Plugins.Add(new ConsulFeature());
+            Plugins.Add(new ConsulFeature { IncludeDefaultServiceHealth = false, ServiceChecks = { new }});
             Plugins.Add(new MetadataFeature());
 
             // set up localhost redis to enable health check
@@ -51,11 +53,13 @@ namespace TestServiceA
     {
         public EchoAReply Any(EchoA echo)
         {
-            //if (echo.CallRemoteService)
-            //{
-            //    return new JsonServiceClient().TryGetClientFor<EchoB>();
-            //}
-            return new EchoAReply { Message = "Hello from service A" };
+            if (!echo.CallRemoteService)
+            {
+                return new EchoAReply { Message = "Hello from service A" };
+            }
+
+            var remoteResponse = new JsonServiceClient().TryGetClientFor<EchoB>()?.Send(new EchoB());
+            return new EchoAReply { Message = remoteResponse?.Message };
         }
     }
 

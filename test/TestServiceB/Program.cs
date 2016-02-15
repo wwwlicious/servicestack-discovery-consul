@@ -1,7 +1,9 @@
-﻿using System;
-
+﻿// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace TestServiceA
 {
+    using System;
     using System.Diagnostics;
     using ServiceStack;
     using ServiceStack.Discovery.Consul;
@@ -47,7 +49,7 @@ namespace TestServiceA
         {
             if (!echo.CallRemoteService)
             {
-                return new EchoBReply { Message = "Hello from service A" };
+                return new EchoBReply { Message = "Hello from service B" };
             }
 
             var remoteResponse = new JsonServiceClient().TryGetClientFor<EchoA>()?.Send(new EchoA());

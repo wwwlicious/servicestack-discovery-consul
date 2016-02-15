@@ -1,17 +1,14 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
 namespace ServiceStack.Discovery.Consul
 {
     using System.Runtime.Serialization;
 
-    using ServiceStack.FluentValidation;
-
     [Route("/v1/agent/service/register", "PUT")]
-    public class ConsulRegisterService : IUrlFilter
+    public class ConsulServiceRegistration : IUrlFilter
     {
-        public ConsulRegisterService(string name, string version)
+        public ConsulServiceRegistration(string name, string version)
         {
             ID = name + version;
             Name = name;
@@ -33,15 +30,6 @@ namespace ServiceStack.Discovery.Consul
         public string ToUrl(string absoluteUrl)
         {
             return string.IsNullOrWhiteSpace(AclToken) ? absoluteUrl : absoluteUrl.AddQueryParam("token", AclToken);
-        }
-    }
-
-    public class ConsulRegisterServiceValidator : AbstractValidator<ConsulRegisterService>
-    {
-        public ConsulRegisterServiceValidator()
-        {
-            RuleFor(x => x.Name).NotEmpty();
-            RuleFor(x => x.Port).GreaterThan(0);
         }
     }
 }
