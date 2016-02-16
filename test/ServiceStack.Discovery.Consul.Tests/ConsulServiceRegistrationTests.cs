@@ -65,7 +65,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         [Fact]
         public void DeSerialize_Consul_Service_Json()
         {
-            var result = "{\"ServiceAv2 - 0\":{\"ID\":\"ServiceAv2-0\",\"Service\":\"ServiceA\",\"Tags\":[\"v2-0\",\"EchoA\"],\"Address\":\"http://127.0.0.1:8091/\",\"Port\":0,\"EnableTagOverride\":false,\"CreateIndex\":0,\"ModifyIndex\":0}}";
+            var result = "{\"ServiceAv2 - 0\":{\"ID\":\"ServiceAv2-0\",\"Service\":\"ServiceA\",\"Tags\":[\"v2-0\",\"EchoA\"],\"Address\":\"http://127.0.0.1:8091/\",\"Port\":1,\"EnableTagOverride\":false,\"CreateIndex\":0,\"ModifyIndex\":0}}";
             var jsonObject = JsonObject.Parse(result);
             var services = jsonObject.Values.Select(x => x.FromJson<ConsulServiceResponse>()).ToArray();
 
