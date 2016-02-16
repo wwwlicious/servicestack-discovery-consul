@@ -7,8 +7,8 @@
     <ProjectGuid>{05DE4C72-C7A0-4BE4-B2D5-4E42625F572B}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TestServiceA</RootNamespace>
-    <AssemblyName>TestServiceA</AssemblyName>
+    <RootNamespace>TestServiceB</RootNamespace>
+    <AssemblyName>TestServiceB</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
