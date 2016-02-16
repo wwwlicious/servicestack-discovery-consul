@@ -2,6 +2,8 @@
 
 A plugin for ServiceStack that registers and deregisters Services with [Consul.io](http://consul.io) and provides service discovery.
 
+[![Build status](https://ci.appveyor.com/api/projects/status/55830emag9ksyasf?svg=true)](https://ci.appveyor.com/project/wwwlicious/servicestack-discovery-consul)
+
 ## Requirements
 
 A consul agent must be running on the same machine as the AppHost.
