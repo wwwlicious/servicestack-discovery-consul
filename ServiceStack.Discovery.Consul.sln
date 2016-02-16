@@ -13,8 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Discovery.Cons
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".docs", ".docs", "{00F2FB49-D8AF-46A7-8EAD-704D6D7693FA}"
 	ProjectSection(SolutionItems) = preProject
-		licence.txt = licence.txt
-		readme..md = readme..md
+		LICENSE = LICENSE
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestServiceA", "test\TestServiceA\TestServiceA.csproj", "{428A99A8-32C7-48A4-AC6B-9A19D4712F28}"

@@ -1,6 +1,6 @@
 # ServiceStack.Discovery.Consul
 
-A plugin for ServiceStack that registers and deregisters Services with [Consul.io](http://consul.io) and provides RequestDTO service discovery
+A plugin for ServiceStack that registers and deregisters Services with [Consul.io](http://consul.io) and provides service discovery
 
 ## Requirements
 
@@ -15,13 +15,13 @@ public override void Configure(Container container)
 {
     SetConfig(new HostConfig
     {
-      WebHostUrl = Program.ServiceUrl
+      WebHostUrl = "http://localhost:1234" // add your apphost external url here
     });
 
     Plugins.Add(new ConsulFeature(this));
 }
 ```
-Pass the resolver the DTO from an external service using the plugin.
+Pass the resolver the RequestDTO from an external service using the plugin.
 and an empty client, the client will find the correct service url or return null
 if no clients are 
 
