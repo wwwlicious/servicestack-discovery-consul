@@ -41,7 +41,7 @@ namespace TestServiceA
                 ApiVersion = "2.0"
             });
 
-            Plugins.Add(new ConsulFeature { IncludeDefaultServiceHealth = false, ServiceChecks = { new }});
+            Plugins.Add(new ConsulFeature { IncludeDefaultServiceHealth = false });
             Plugins.Add(new MetadataFeature());
 
             // set up localhost redis to enable health check
