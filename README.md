@@ -62,7 +62,7 @@ By default the plugin creates 2 health checks
 1. Heartbeat : Creates an endpoint in your service [http://locahost:1234/reply/json/heartbeat](http://locahost:1234/reply/json/heartbeat) that expects a 200 response
 2. If Redis has been configured in the AppHost, it will check Redis is responding
 
-To turn off the default checks use the following:+1:
+To turn off the default checks use the following:
 ```csharp
 Plugins.Add(new ConsulFeature(this) { IncludeDefaultServiceHealth = false });
 ```
