@@ -1,6 +1,6 @@
 # ServiceStack.Discovery.Consul
 
-A plugin for ServiceStack that registers and deregisters Services with [Consul.io](http://consul.io) and provides service discovery
+A plugin for ServiceStack that registers and deregisters Services with [Consul.io](http://consul.io) and provides service discovery.
 
 ## Requirements
 
@@ -8,22 +8,26 @@ A consul agent must be running on the same machine as the AppHost.
 
 ## Quick Start
 
-Add the following to your AppHost, WebHostUrl and the Plugin
+Add the following to your `AppHost`
 
 ```csharp
 public override void Configure(Container container)
 {
     SetConfig(new HostConfig
     {
-      WebHostUrl = "http://localhost:1234" // add your apphost external url here
+        // the url:port that other services will use to access this one
+        WebHostUrl = "http://api.acme.com:1234" 
+        
+        // optional 
+        ApiVersion = "2.0"
+        HandlerFactoryPath = "/api/"
     });
 
     Plugins.Add(new ConsulFeature(this));
 }
 ```
-Pass the resolver the RequestDTO from an external service using the plugin.
-and an empty client, the client will find the correct service url or return null
-if no clients are 
+Use `TryGetClientFor<T>()` with your remote RequestDTO on any ServiceClient and it will
+be configured for the correct remote service.
 
 ```csharp
 var client = new JsonServiceClient().TryGetClientFor<ExternalDTO>();
@@ -55,7 +59,7 @@ When the AppHost is shutdown, it will deregister the service.
 
 #### Health checks
 
-Each service can have a number of health checks.  
+Each service can have a number of health checks. This allows service discovery to filter out failing instances of your services.
 
 By default the plugin creates 2 health checks
 
@@ -64,7 +68,7 @@ By default the plugin creates 2 health checks
 
 To turn off the default checks use the following:
 ```csharp
-Plugins.Add(new ConsulFeature(this) { IncludeDefaultServiceHealth = false });
+Plugins.Add(new ConsulFeature() { IncludeDefaultServiceHealth = false });
 ```
 
 #### Custom health checks
@@ -72,20 +76,24 @@ Plugins.Add(new ConsulFeature(this) { IncludeDefaultServiceHealth = false });
 You can add your own health checks
 
 ```csharp
-using ConsulFeature(this, new AgentServiceCheck());
+using ConsulFeature() { ServiceChecks.Add(new AgentServiceCheck()) };
 ```  
-or
-to turn off these defaults, set the ConsulFeature(this) { IncludeDefaultServiceHealth = false }
 
 ### Discovery
 
-The default discovery mechanism uses the RequestDTO type names to resolve the services capable of processing the request.
-This means that you should always use unique names across all your services for each of your RequestDTO's
+The default discovery mechanism uses the ServiceStack request type names to resolve all of the services capable of processing the request. This means that you should always use unique names across all your services for each of your RequestDTO's
 
-To resolve the correct service use the following client extension
+To resolve the correct service for a request, pass the request type to the extension method: 
+```csharp
+ServiceClientBase.TryGetClientFor<T>();
+```
+This will query consul for healthy services that can process the type and return a client
 
 ```csharp
+// Go and find out where we need to send ExternalDTO and return the client for it.
 var client = new JsonServiceClient().TryGetClientFor<ExternalDTO>();
+
+// Query our remote service without knowing where it is
 var result = client.Send(new ExternalDTO());
 ```
 
