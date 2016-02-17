@@ -1,6 +1,6 @@
 # ServiceStack.Discovery.Consul
 
-A plugin for ServiceStack that registers and deregisters Services with [Consul.io](http://consul.io) and provides service discovery.
+A plugin for [ServiceStack](https://servicestack.net/) that registers and deregisters Services with [Consul.io](http://consul.io) and provides service discovery.
 
 [![Build status](https://ci.appveyor.com/api/projects/status/55830emag9ksyasf?svg=true)](https://ci.appveyor.com/project/wwwlicious/servicestack-discovery-consul)
 
