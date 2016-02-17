@@ -30,7 +30,7 @@ public override void Configure(Container container)
         HandlerFactoryPath = "/api/"
     });
 
-    Plugins.Add(new ConsulFeature(this));
+    Plugins.Add(new ConsulFeature());
 }
 ```
 Use `TryGetClientFor<T>()` with your remote RequestDTO on any ServiceClient and it will
