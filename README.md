@@ -78,7 +78,7 @@ Plugins.Add(new ConsulFeature() { IncludeDefaultServiceHealth = false });
 You can add your own health checks
 
 ```csharp
-using ConsulFeature() { ServiceChecks.Add(new AgentServiceCheck()) };
+using ConsulFeature() { ServiceChecks.Add(new ConsulRegisterCheck()) };
 ```  
 
 ### Discovery
