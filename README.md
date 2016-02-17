@@ -43,7 +43,7 @@ Before you start your services, you'll need to [download consul](https://www.con
 
 The following will create an in-memory instance which is useful for testing
 
-```shell
+```bash
 
 consul.exe agent -dev -advertise=127.0.0.1
 
