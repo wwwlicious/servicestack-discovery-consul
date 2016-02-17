@@ -10,6 +10,11 @@ A consul agent must be running on the same machine as the AppHost.
 
 ## Quick Start
 
+Install the package [https://www.nuget.org/packages/ServiceStack.Discovery.Consul](https://www.nuget.org/packages/ServiceStack.Discovery.Consul/)
+```bash
+Install-Package ServiceStack.Discovery.Consul
+```
+
 Add the following to your `AppHost`
 
 ```csharp
