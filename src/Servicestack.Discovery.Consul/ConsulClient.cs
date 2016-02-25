@@ -1,6 +1,7 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 namespace ServiceStack.Discovery.Consul
 {
     using System;
@@ -9,9 +10,13 @@ namespace ServiceStack.Discovery.Consul
 
     using ServiceStack;
     using ServiceStack.Redis;
-
+    using ServiceStack.FluentValidation;
+    
     public static class ConsulClient
     {
+        private static readonly ConsulRegisterCheckValidator HealthcheckValidator = new ConsulRegisterCheckValidator();
+        private static readonly ConsulRegisterServiceValidator ServiceValidator = new ConsulRegisterServiceValidator();
+
         /// <summary>
         /// Tags will be the main mechanism of discovery for any servicestack requestDTO's
         /// </summary>
@@ -55,6 +60,8 @@ namespace ServiceStack.Discovery.Consul
                                         Address = baseUrl,
                                         Tags = tags.ToArray()
                                    };
+
+            ServiceValidator.ValidateAndThrow(registration);
 
             var registrationUrl = ConsulUris.LocalAgent.CombineWith(registration.ToPutUrl());
             registrationUrl.PostJsonToUrlAsync(registration, null,
@@ -110,6 +117,8 @@ namespace ServiceStack.Discovery.Consul
 
         private static void RegisterHealthCheck(ConsulRegisterCheck check)
         {
+            HealthcheckValidator.ValidateAndThrow(check);
+
             ConsulUris.LocalAgent.CombineWith(check.ToPutUrl()).PostJsonToUrlAsync(
                 check,
                 null,
