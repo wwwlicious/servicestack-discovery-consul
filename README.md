@@ -104,7 +104,11 @@ var client = new JsonServiceClient().TryGetClientFor<ExternalDTO>();
 var result = client.Send(new ExternalDTO());
 ```
 
+### Example
 
+The following shows the services registered with consul and passing health checks and the services running on different IP:Port/Paths
+
+![Services](assets/Services.png)
  
 
 
