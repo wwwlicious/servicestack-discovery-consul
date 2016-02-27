@@ -118,10 +118,7 @@ public class CustomDiscoveryRequestTypeResolver : IDiscoveryRequestTypeResolver
 #### Autowiring Client
 
 
-To autowire a client you can pass on into the `new ConsulFeature(new JsvServiceClient())` constructor. 
-This will set the client property `ServiceClientBase.TypedUrlResolver = Consul.ResolveTypedUrl;` and register
-the client with the Func IoC container.
-
+To autowire a client, pass it into the plugin constructor: `new ConsulFeature(new JsvServiceClient())` 
 You can then use an `IServiceClient` in your service and everything will just work 
 
 ```csharp
@@ -138,7 +135,7 @@ public class EchoService : Service
 ```
 #### Manual Client
 
-If you dont want the service client to be autowired, don't pass a client to the ConsulFeature constructor and set the following client property
+If you dont want the service client to be autowired, don't pass a client to the plugin constructor and set the following client property
 
 ```csharp
 var client = new JsonServiceClient { TypedUrlResolver = Consul.ResolveTypedUrl };
