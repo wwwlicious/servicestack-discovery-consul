@@ -9,7 +9,7 @@ namespace ServiceStack.Discovery.Consul
         public static string ResolveTypedUrl(IServiceClientMeta client, string method, object dto)
         {
             var baseUri = ConsulClient.DiscoveryRequestResolver.ResolveBaseUri(dto);
-            return baseUri?.CombineWith(dto.ToRelativeUri(method)) ?? client?.BaseUri;
+            return (baseUri ?? client?.BaseUri)?.CombineWith(dto.ToUrl(method ?? "GET", client?.Format));
         }
     }
 }
