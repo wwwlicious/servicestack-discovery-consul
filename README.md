@@ -76,6 +76,8 @@ in the Consol UI when you start it.
 
 #### Health checks
 
+![Default Health Checks](assets/HealthChecks.png)
+
 Each service can have a number of health checks. This allows service discovery to filter out failing instances of your services.
 
 By default the plugin creates 2 health checks
@@ -92,7 +94,7 @@ Plugins.Add(new ConsulFeature() { IncludeDefaultServiceHealth = false });
 You can add your own health checks
 
 ```csharp
-using ConsulFeature() { ServiceChecks.Add(new ConsulRegisterCheck()) };
+new ConsulFeature() { ServiceChecks.Add(new ConsulRegisterCheck()) };
 ```
 ### Discovery
 
