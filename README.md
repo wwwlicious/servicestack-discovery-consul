@@ -50,7 +50,6 @@ public class MyService : Service
         // the client will resolve the correct uri for the external dto using consul
         var response = Client.Send(new ExternalDTO { Custom = "bob" });
     }
-
 }
 ```
 ## Running your services
@@ -70,7 +69,7 @@ in the Consol UI when you start it.
 
 ### Automatic Service Registration
 
-![Automatic Service Registration](assets/serviceregistration.png)
+![Automatic Service Registration](assets/ServiceRegistration.png)
 
 * Registers the service with a Consul agent once the AppHost has been initialised.
 * Deregisters the service when the AppHost is shutdown.
