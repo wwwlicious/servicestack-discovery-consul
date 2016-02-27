@@ -98,7 +98,7 @@ using ConsulFeature() { ServiceChecks.Add(new ConsulRegisterCheck()) };
 
 The default discovery mechanism uses the ServiceStack request type names to resolve all of the services capable of processing the request. This means that you should always use unique names across all your services for each of your RequestDTO's
 
-To override the default behaviour, you can implement your own `IDiscoveryTypeResolver`
+To override the default behaviour, you can implement your own `IDiscoveryRequestTypeResolver`
 
 ```csharp
 public class CustomDiscoveryRequestTypeResolver : IDiscoveryRequestTypeResolver
