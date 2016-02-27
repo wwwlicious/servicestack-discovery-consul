@@ -11,30 +11,16 @@ namespace ServiceStack.Discovery.Consul
     using ServiceStack;
     using ServiceStack.Redis;
     using ServiceStack.FluentValidation;
-    
+
     public static class ConsulClient
     {
         private static readonly ConsulRegisterCheckValidator HealthcheckValidator = new ConsulRegisterCheckValidator();
         private static readonly ConsulRegisterServiceValidator ServiceValidator = new ConsulRegisterServiceValidator();
 
         /// <summary>
-        /// Tags will be the main mechanism of discovery for any servicestack requestDTO's
+        /// Tags are the main mechanism of discovery for any servicestack requestDTO's
         /// </summary>
-        public static IDiscoveryRequestTypeResolver DiscoveryTypeResolver { private get; set; }
-
-        public static ServiceClientBase TryGetClientFor<T>(this ServiceClientBase client, T type)
-        {
-            return TryGetClientFor<T>(client);
-        }
-
-        public static ServiceClientBase TryGetClientFor<T>(this ServiceClientBase client)
-        {
-            var consulServiceAddress = DiscoveryTypeResolver.ResolveRequestType<T>();
-            if (consulServiceAddress.IsNullOrEmpty()) return client;
-
-            client.SetBaseUri(consulServiceAddress);
-            return client.BaseUri.IsNullOrEmpty() ? null : client;
-        }
+        public static IDiscoveryRequestTypeResolver DiscoveryRequestResolver { get; set; }
 
         /// <summary>
         /// Registers the servicestack apphost with the local consul agent
@@ -52,7 +38,7 @@ namespace ServiceStack.Discovery.Consul
 
             // build tags from request types
             var tags = new List<string> { version };
-            tags.AddRange(DiscoveryTypeResolver.GetRequestTypes(host));
+            tags.AddRange(DiscoveryRequestResolver.GetRequestTypes(host));
             tags.AddRange(customTags);
 
             var registration = new ConsulServiceRegistration(HostContext.ServiceName, version)
@@ -92,6 +78,7 @@ namespace ServiceStack.Discovery.Consul
             {
                 RegisterHealthCheck(check);
             }
+
 
             return registration;
         }
@@ -160,7 +147,7 @@ namespace ServiceStack.Discovery.Consul
             {
                 IntervalInSeconds = 20,
                 HTTP = baseUrl.CombineWith("/json/reply/heartbeat"),
-                Notes = "This check is a GET HTTP request which expects the service to return 200 OK"
+                Notes = "This check is an HTTP GET request which expects the service to return 200 OK"
             };
             checks.Add(heartbeatCheck);
 

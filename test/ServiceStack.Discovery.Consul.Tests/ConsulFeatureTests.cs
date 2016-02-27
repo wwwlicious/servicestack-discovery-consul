@@ -30,5 +30,29 @@ namespace ServiceStack.Discovery.Consul.Tests
 
             plugin.ServiceChecks.Should().BeEmpty();
         }
+
+        [Fact]
+        public void DiscoveryTypeResolver_Should_NotBeNull()
+        {
+            var host = new BasicAppHost { Config = new HostConfig { WebHostUrl = "http://localhost" } };
+
+            var plugin = new ConsulFeature();
+
+            plugin.DiscoveryTypeResolver.Should().NotBeNull();
+        }
+
+        [Fact]
+        public void Will_Register_Client_If_Specifed()
+        {
+            var host = new BasicAppHost { Config = new HostConfig { WebHostUrl = "http://localhost" } };
+
+            var client = new JsonServiceClient();
+            var plugin = new ConsulFeature(client);
+            plugin.Register(host);
+
+            host.Resolve<IServiceClient>().Should().Be(client);
+        }
+
+
     }
 }

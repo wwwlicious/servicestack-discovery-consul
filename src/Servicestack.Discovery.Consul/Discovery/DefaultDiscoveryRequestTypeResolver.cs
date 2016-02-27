@@ -18,7 +18,7 @@ namespace ServiceStack.Discovery.Consul
             var nativeTypes = host.GetPlugin<NativeTypesFeature>();
             var requestTypes =
                 host.Metadata.RequestTypes
-                    .Where(x => PlatformExtensions.AllAttributes<ExcludeAttribute>((Type)x).All(a => a.Feature != Feature.Metadata))
+                    .Where(x => x.AllAttributes<ExcludeAttribute>().All(a => a.Feature != Feature.Metadata))
                     .Where(x => !nativeTypes.MetadataTypesConfig.IgnoreTypes.Contains(x))
                     .Where(x => !nativeTypes.MetadataTypesConfig.IgnoreTypesInNamespaces.Contains(x.Namespace))
                     // TODO Respect the RestrictAttribute
@@ -28,19 +28,20 @@ namespace ServiceStack.Discovery.Consul
             return requestTypes.Select(x => x.Name).ToArray();
         }
 
-        public string ResolveRequestType<T>()
+        public string ResolveBaseUri(object dto)
         {
             // strategy (filter out critical, perfer health over warning), 
             // TODO include acltoken filtering
             // NOTE can use consul query to make a single call can find criteria (tag match and healthy vs warning services)
             var servicesJson = ConsulUris.GetServices.GetJsonFromUrl();
+            var dtoType = dto.GetType();
             try
             {
                 // find services to serve request type
                 var services = JsonObject.Parse(servicesJson)
                         .Select(x => x.Value.FromJson<ConsulServiceResponse>())
                         .ToArray();
-                var matches = services.Where(x => x.Tags.Contains(typeof(T).Name)).ToArray();
+                var matches = services.Where(x => x.Tags.Contains(dtoType.Name)).ToArray();
                 if (matches.Any())
                 {
                     // TODO filter out any unhealthy services
@@ -50,7 +51,7 @@ namespace ServiceStack.Discovery.Consul
             }
             catch (Exception e)
             {
-                Logging.LogManager.GetLogger(typeof(ConsulClient)).Error($"Could not find service for {typeof(T).Name}", e);
+                Logging.LogManager.GetLogger(typeof(ConsulClient)).Error($"Could not find service for {dtoType.Name}", e);
                 throw;
             }
         }

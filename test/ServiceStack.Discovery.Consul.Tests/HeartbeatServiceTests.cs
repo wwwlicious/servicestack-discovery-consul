@@ -11,24 +11,22 @@ namespace ServiceStack.Discovery.Consul.Tests
 
     using Xunit;
 
-    public class HeartbeatServiceTests : IDisposable
+    [Collection("HeartBeatTests")]
+    public class HeartbeatServiceTests
     {
-        private readonly ServiceStackHost host;
-
         private readonly HeartbeatService service;
 
         public HeartbeatServiceTests()
         {
-            host = new BasicAppHost().Init();
-            host.Container.RegisterAutoWired<HeartbeatService>();
+            if (ServiceStackHost.Instance == null)
+            {
+                var host = new BasicAppHost().Init();
+                host.Container.RegisterAutoWired<HeartbeatService>();
+
+            }
             var mockHttpRequest = new MockHttpRequest("Heartbeat", "GET", "json", "heartbeat", null, null, null);
 
             service = new HeartbeatService { Request = mockHttpRequest };
-        }
-
-        public void Dispose()
-        {
-            host.Dispose();
         }
 
         [Fact]

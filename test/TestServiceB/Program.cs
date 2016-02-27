@@ -38,7 +38,7 @@ namespace TestServiceB
             // run from a handler path
             SetConfig(new HostConfig { WebHostUrl = serviceUrl, HandlerFactoryPath = "/api/" });
 
-            Plugins.Add(new ConsulFeature());
+            Plugins.Add(new ConsulFeature(new JsonServiceClient()));
             Plugins.Add(new MetadataFeature());
         }
     }
@@ -52,7 +52,11 @@ namespace TestServiceB
                 return new EchoBReply { Message = "Hello from service B" };
             }
 
-            var remoteResponse = new JsonServiceClient().TryGetClientFor<EchoA>()?.Send(new EchoA());
+            // manually assign the Consul.ResolveTypedUrl delegate
+            var client = new JsonServiceClient { TypedUrlResolver = Consul.ResolveTypedUrl };
+
+            // this will resolve the correct remote uri using consul for the external DTO
+            var remoteResponse = client.Send(new EchoA());
             return new EchoBReply { Message = remoteResponse?.Message };
         }
     }
@@ -60,11 +64,14 @@ namespace TestServiceB
     [Route("/echo/b", "POST")] // test reverse lookup route
     public class EchoB : IReturn<EchoBReply>
     {
+        [ApiMember(Description = "when specified, ServiceB will call ServiceA")]
         public bool CallRemoteService { get; set; }
     }
 
     public class EchoBReply
     {
+        public string CurrentService { get; } = "ServiceB";
+
         public string Message { get; set; }
     }
 }

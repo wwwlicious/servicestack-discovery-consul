@@ -8,8 +8,13 @@ namespace ServiceStack.Discovery.Consul
 
     using ServiceStack;
 
+    /// <summary>
+    /// Enabled service to service calls by dynamically looking up remote service url
+    /// </summary>
     public class ConsulFeature : IPlugin
     {
+        private readonly ServiceClientBase defaultServiceClient;
+
         /// <summary>
         /// Can be used to add tags such as environment to the service registration
         /// </summary>
@@ -17,7 +22,16 @@ namespace ServiceStack.Discovery.Consul
 
         public List<ConsulRegisterCheck> ServiceChecks { get; } = new List<ConsulRegisterCheck>();
 
-        public IDiscoveryRequestTypeResolver TypeResolver { get; set; } = new DefaultDiscoveryRequestTypeResolver();
+        public IDiscoveryRequestTypeResolver DiscoveryTypeResolver { get; set; } = new DefaultDiscoveryRequestTypeResolver();
+
+        /// <summary>
+        /// Enables service discovery using consul to resolve the correct url for a remote RequestDTO
+        /// </summary>
+        /// <param name="defaultServiceClient">If specified, will register a client with IoC for Autowiring</param>
+        public ConsulFeature(ServiceClientBase defaultServiceClient = null)
+        {
+            this.defaultServiceClient = defaultServiceClient;
+        }
 
         public bool IncludeDefaultServiceHealth { get; set; } = true;
 
@@ -32,7 +46,15 @@ namespace ServiceStack.Discovery.Consul
 
             appHost.AfterInitCallbacks.Add(RegisterService);
             appHost.OnDisposeCallbacks.Add(UnRegisterService);
-            ConsulClient.DiscoveryTypeResolver = TypeResolver;
+            ConsulClient.DiscoveryRequestResolver = DiscoveryTypeResolver;
+
+            // register with IoC if default client specified, otherwise will leave 
+            // implementor to manually register the TypedUrlResolverDelegate
+            if (defaultServiceClient != null)
+            {
+                defaultServiceClient.TypedUrlResolver = Consul.ResolveTypedUrl;
+                appHost.GetContainer().Register<IServiceClient>(defaultServiceClient);
+            }
         }
 
         private void RegisterService(IAppHost host)

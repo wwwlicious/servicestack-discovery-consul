@@ -7,6 +7,6 @@ namespace ServiceStack.Discovery.Consul
     {
         string[] GetRequestTypes(IAppHost host);
 
-        string ResolveRequestType<T>();
+        string ResolveBaseUri(object dto);
     }
 }

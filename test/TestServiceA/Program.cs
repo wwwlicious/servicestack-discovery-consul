@@ -1,7 +1,7 @@
 ﻿// This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
-namespace TestServiceB
+namespace TestServiceA
 {
     using System;
     using System.Diagnostics;
@@ -41,7 +41,7 @@ namespace TestServiceB
                 ApiVersion = "2.0"
             });
 
-            Plugins.Add(new ConsulFeature { IncludeDefaultServiceHealth = false });
+            Plugins.Add(new ConsulFeature(new JsvServiceClient()) { IncludeDefaultServiceHealth = false });
             Plugins.Add(new MetadataFeature());
 
             // set up localhost redis to enable health check
@@ -51,6 +51,11 @@ namespace TestServiceB
      
     public class EchoService : Service
     {
+        /// <summary>
+        /// uses the client specified in the ConsulFeature constructor
+        /// </summary>
+        public IServiceClient Client { get; set; }
+
         public EchoAReply Any(EchoA echo)
         {
             if (!echo.CallRemoteService)
@@ -58,18 +63,22 @@ namespace TestServiceB
                 return new EchoAReply { Message = "Hello from service A" };
             }
 
-            var remoteResponse = new JsonServiceClient().TryGetClientFor<EchoB>()?.Send(new EchoB());
+            // this will resolve the correct remote uri using consul for the external DTO
+            var remoteResponse = Client.Post(new EchoB());
             return new EchoAReply { Message = remoteResponse?.Message };
         }
     }
 
     public class EchoA : IReturn<EchoAReply>
     {
+        [ApiMember(Description = "when specified, ServiceA will call ServiceB")]
         public bool CallRemoteService { get; set; }
     }
 
     public class EchoAReply
     {
+        public string CurrentService { get; } = "ServiceA";
+
         public string Message { get; set; }
     }
 }
