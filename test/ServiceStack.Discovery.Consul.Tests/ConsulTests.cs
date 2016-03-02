@@ -28,7 +28,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         public void Resolver_ReturnsDefaultRoute_ByDTOTypeName()
         {
             var remoteuri = "http://remoteuri:1234/api/";
-            var expected = remoteuri.CombineWith("/json/reply/ConsulTests.TestDTO?");
+            var expected = remoteuri.CombineWith("/json/reply/ConsulTests.TestDTO");
 
             var discovery = new TestDiscovery();
             discovery.TypeTypes.Add(typeof(TestDTO), remoteuri);
@@ -41,7 +41,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         public void Resolver_ReturnsBaseUri_ForUnregisteredType()
         {
             var baseUri = "http://testuri/";
-            var expected = baseUri.CombineWith("/json/reply/ConsulTests.TestDTO?");
+            var expected = baseUri.CombineWith("/json/reply/ConsulTests.TestDTO");
             ConsulClient.DiscoveryRequestResolver = new TestDiscovery();
 
             Consul.ResolveTypedUrl(new JsonServiceClient(baseUri), null, new TestDTO()).Should().Be(expected);

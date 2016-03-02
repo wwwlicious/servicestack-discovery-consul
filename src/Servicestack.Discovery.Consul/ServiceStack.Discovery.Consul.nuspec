@@ -10,11 +10,11 @@
     <iconUrl>https://servicestack.net/img/logo-32.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <tags>servicestack plugin discovery servicediscovery microservices consul</tags>
-    <releaseNotes>See changelog for details</releaseNotes>
+    <releaseNotes>See github project for details</releaseNotes>
     <dependencies>
-      <dependency id="ServiceStack" version="[4.0.53, 5)" />
-      <dependency id="ServiceStack.Common" version="[4.0.53, 5)" />
-      <dependency id="ServiceStack.Text" version="[4.0.53, 5)" />
+      <dependency id="ServiceStack" version="[4.0.54, 5)" />
+      <dependency id="ServiceStack.Common" version="[4.0.54, 5)" />
+      <dependency id="ServiceStack.Text" version="[4.0.54, 5)" />
     </dependencies>
   </metadata>
 </package>
