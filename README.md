@@ -27,10 +27,10 @@ public class AppHost : AppSelfHostBase
         SetConfig(new HostConfig
         {
             // the url:port that other services will use to access this one
-            WebHostUrl = "http://api.acme.com:1234"
+            WebHostUrl = "http://api.acme.com:1234",
 
             // optional
-            ApiVersion = "2.0"
+            ApiVersion = "2.0",
             HandlerFactoryPath = "/api/"
         });
 
@@ -60,12 +60,12 @@ Before you start your services, you'll need to [download consul](https://www.con
 The following will create an in-memory instance which is useful for testing
 
 ```bash
-consul.exe agent -dev -advertise=127.0.0.1
+consul.exe agent -dev -advertise="127.0.0.1"
 ```
 You should now be able to view the [Consul UI](http://127.0.0.1:8500/ui)
 
 Once you have added the plugin to your ServiceStack AppHost, you should see it appear
-in the Consol UI when you start it.
+in the Consul UI when you start it.
 
 ### Automatic Service Registration
 
