@@ -76,9 +76,9 @@ namespace ServiceStack.Discovery.Consul
 
             foreach (var check in checks)
             {
+                check.ServiceID = registration.ID;
                 RegisterHealthCheck(check);
             }
-
 
             return registration;
         }
@@ -99,7 +99,6 @@ namespace ServiceStack.Discovery.Consul
                             logger.Debug("Consul unregistered service");
                         }
                     });
-
         }
 
         private static void RegisterHealthCheck(ConsulRegisterCheck check)

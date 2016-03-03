@@ -8,6 +8,11 @@ namespace ServiceStack.Discovery.Consul
     [Route("/v1/agent/check/register", "PUT")]
     public class ConsulRegisterCheck : IUrlFilter
     {
+        /// <summary>
+        /// Creates a new health check in consul
+        /// </summary>
+        /// <param name="name">The name to use for the health check in consul - descriptive only</param>
+        /// <param name="serviceId">The Id of service to associate this health check with</param>
         public ConsulRegisterCheck(string name, string serviceId = null)
         {
             Name = name;
@@ -29,7 +34,7 @@ namespace ServiceStack.Discovery.Consul
         /// <summary>
         /// The service name to associate the check with, leave blank for agent check
         /// </summary>
-        public string ServiceID { get; }
+        public string ServiceID { get; set; }
 
         /// <summary>
         /// User notes on the check

@@ -38,8 +38,7 @@ namespace TestServiceB
             // run from a handler path
             SetConfig(new HostConfig { WebHostUrl = serviceUrl, HandlerFactoryPath = "/api/" });
 
-            Plugins.Add(new ConsulFeature(new JsonServiceClient()));
-            Plugins.Add(new MetadataFeature());
+            Plugins.Add(new ConsulFeature());
         }
     }
 
@@ -56,7 +55,7 @@ namespace TestServiceB
             var client = new JsonServiceClient { TypedUrlResolver = Consul.ResolveTypedUrl };
 
             // this will resolve the correct remote uri using consul for the external DTO
-            var remoteResponse = client.Send(new EchoA());
+            var remoteResponse = client.Post(new EchoA());
             return new EchoBReply { Message = remoteResponse?.Message };
         }
     }
