@@ -1,7 +1,9 @@
 # ServiceStack.Discovery.Consul 
 [![Build status](https://ci.appveyor.com/api/projects/status/55830emag9ksyasf?svg=true)](https://ci.appveyor.com/project/wwwlicious/servicestack-discovery-consul)
 
-A plugin for [ServiceStack](https://servicestack.net/) that provides external RequestDTO endpoint discovery with [Consul.io](http://consul.io) and provides automatic service registration and health checking.
+A plugin for [ServiceStack](https://servicestack.net/) that provides transparent service discovery using [Consul.io](http://consul.io) with automatic service registration and health checking.
+
+This enables one servicestack AppHost service to call another AppHost service, without either knowing where the other is, based solely on the request type name. The health checks will also ensure that if you run multiple instances of a service, only the healthy service will be returned. 
 
 ![RequestDTO Service Discovery](assets/RequestDTOServiceDiscovery.png)
 
