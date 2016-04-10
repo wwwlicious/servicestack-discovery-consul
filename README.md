@@ -4,7 +4,7 @@
 
 A plugin for [ServiceStack](https://servicestack.net/) that provides transparent service discovery using [Consul.io](http://consul.io) with automatic service registration and health checking.
 
-This enables your servicestack instances to call one another, without either knowing where the other is, based solely on a copy of the requestDTO. Your services will not need to take any dependencies on each other and as you deploy updates to your services and they will automatically be registered and used without reconfiguing the existing services.
+This enables your servicestack instances to call one another, without either knowing where the other is, based solely on a copy of the requestDTO. Your services will not need to take any dependencies on each other and as you deploy updates to your services they will automatically be registered and used without reconfiguing the existing services.
 
 The customisable health checks for each service will also ensure that failing services will not be used, or if you run multiple instances of a service, only the healthy and most responsive service will be returned. 
 
