@@ -50,7 +50,7 @@ public class MyService : Service
 
     public void Any(RequestDTO dto)
     {
-        // the automatically find the correct uri endpoint for the the request using consul
+        // will automatically find the correct uri endpoint for the the request using consul
         var response = Client.Post(new ExternalDTO { Custom = "bob" });
     }
 }
