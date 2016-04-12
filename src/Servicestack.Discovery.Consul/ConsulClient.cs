@@ -37,7 +37,7 @@ namespace ServiceStack.Discovery.Consul
             var version = "v{0}".Fmt(host.Config?.ApiVersion?.Replace('.', '-'));
 
             // build tags from request types
-            var tags = new List<string> { version };
+            var tags = new List<string> { version, "ServiceStack" };
             tags.AddRange(DiscoveryRequestResolver.GetRequestTypes(host));
             tags.AddRange(customTags);
 
