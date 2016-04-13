@@ -23,22 +23,20 @@ PM> Install-Package ServiceStack.Discovery.Consul
 Add the following to your `AppHost.Configure` method
 
 ```csharp
-
-    public override void Configure(Container container)
+public override void Configure(Container container)
+{
+    SetConfig(new HostConfig
     {
-        SetConfig(new HostConfig
-        {
-            // the url:port that other services will use to access this one
-            WebHostUrl = "http://api.acme.com:1234",
+        // the url:port that other services will use to access this one
+        WebHostUrl = "http://api.acme.com:1234",
 
-            // optional
-            ApiVersion = "2.0",             
-            HandlerFactoryPath = "/api/"
-        });
+        // optional
+        ApiVersion = "2.0",             
+        HandlerFactoryPath = "/api/"
+    });
 
-        // Register the plugin, that's it!
-        Plugins.Add(new ConsulFeature());
-    }
+    // Register the plugin, that's it!
+    Plugins.Add(new ConsulFeature());
 }
 ```
 To call external services, you just call the Gateway and let it handle the routing for you.
@@ -92,7 +90,7 @@ By default the plugin creates 2 health checks
 
 You can turn off the default health checks by setting the following property:
 ```csharp
-Plugins.Add(new ConsulFeature() { IncludeDefaultServiceHealth = false });
+Plugins.Add(new ConsulFeature { IncludeDefaultServiceHealth = false });
 ```
 #### Custom health checks
 
@@ -103,8 +101,11 @@ new ConsulFeature() { ServiceChecks.Add(new ConsulRegisterCheck()) };
 ```
 ### Discovery
 
-The default discovery mechanism uses the ServiceStack request type names to resolve all of the services capable of processing the request. This means that you should always use unique names across all your services for each of your RequestDTO's
-To override the default behaviour, you can implement your own `IDiscoveryRequestTypeResolver`
+The default discovery mechanism uses the ServiceStack request types to resolve 
+all of the services capable of processing the request. This means that you should 
+**always use unique request names** across all your services for each of your RequestDTO's
+To override the default behaviour, you can implement your own 
+`IDiscoveryRequestTypeResolver`
 
 ```csharp
 public class CustomDiscoveryRequestTypeResolver : IDiscoveryRequestTypeResolver
@@ -121,14 +122,14 @@ public class CustomDiscoveryRequestTypeResolver : IDiscoveryRequestTypeResolver
 }
 ```
 
-#### Autowiring Client
+#### Configuring the external client
 
-To change the default service to service client used or add additional configuration, 
-you can pass this into the plugin constructor as follows: 
+To change the default external client used, or just to add additional configuration, 
+you can pass a client delegate into the plugin constructor: 
 ```csharp
-`new ConsulFeature(baseUrl => new JsvServiceClient(baseUrl){ UserName = "custom" })`
+new ConsulFeature(baseUri => new JsvServiceClient(baseUri) { UserName = "custom" })
 ``` 
-You can then use the Gateway as normal and any external call will use your preferred `IServiceGateway` 
+You can then continue to use the Gateway as normal but any external call will now use your preferred `IServiceGateway` 
 
 ```csharp
 public class EchoService : Service
