@@ -11,21 +11,27 @@ namespace ServiceStack.Discovery.Consul.Tests
 
     using Xunit;
 
-    public class ConsulFeatureTests
+    [Collection("AppHost collection")]
+    public class ConsulFeatureTests 
     {
+        private readonly AppHostFixture fixture;
+
+        public ConsulFeatureTests(AppHostFixture fixture)
+        {
+            this.fixture = fixture;
+        }
+
         [Fact]
         public void Config_WebHostUrl_ThrowsException_IfNotSet()
         {
-            var host = new BasicAppHost();
-            Action action = () => new ConsulFeature().Register(host);
+            Action action = () => new ConsulFeature().Register(new BasicAppHost());
+
             action.ShouldThrow<ApplicationException>().Which.Message.Should().Be("appHost.Config.WebHostUrl must be set to use the Consul plugin so that the service can sent it's full http://url:port to Consul");
         }
 
         [Fact]
         public void ServiceChecks_Should_Be_Empty()
         {
-            var host = new BasicAppHost { Config = new HostConfig { WebHostUrl = "http://localhost" } };
-
             var plugin = new ConsulFeature();
 
             plugin.ServiceChecks.Should().BeEmpty();
@@ -34,25 +40,9 @@ namespace ServiceStack.Discovery.Consul.Tests
         [Fact]
         public void DiscoveryTypeResolver_Should_NotBeNull()
         {
-            var host = new BasicAppHost { Config = new HostConfig { WebHostUrl = "http://localhost" } };
-
             var plugin = new ConsulFeature();
 
             plugin.DiscoveryTypeResolver.Should().NotBeNull();
         }
-
-        [Fact]
-        public void Will_Register_Client_If_Specifed()
-        {
-            var host = new BasicAppHost { Config = new HostConfig { WebHostUrl = "http://localhost" } };
-
-            var client = new JsonServiceClient();
-            var plugin = new ConsulFeature(client);
-            plugin.Register(host);
-
-            host.Resolve<IServiceClient>().Should().Be(client);
-        }
-
-
     }
 }
