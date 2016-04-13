@@ -28,13 +28,12 @@ namespace ServiceStack.Discovery.Consul
             return requestTypes.Select(x => x.Name).ToArray();
         }
 
-        public string ResolveBaseUri(object dto)
+        public string ResolveBaseUri(Type dtoType)
         {
             // strategy (filter out critical, perfer health over warning), 
             // TODO include acltoken filtering
             // NOTE can use consul query to make a single call can find criteria (tag match and healthy vs warning services)
             var servicesJson = ConsulUris.GetServices.GetJsonFromUrl();
-            var dtoType = dto.GetType();
             try
             {
                 // find services to serve request type
@@ -54,6 +53,10 @@ namespace ServiceStack.Discovery.Consul
                 Logging.LogManager.GetLogger(typeof(ConsulClient)).Error($"Could not find service for {dtoType.Name}", e);
                 throw;
             }
+        }
+        public string ResolveBaseUri(object dto)
+        {
+            return ResolveBaseUri(dto.GetType());
         }
     }
 }

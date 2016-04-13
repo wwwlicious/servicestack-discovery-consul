@@ -11,7 +11,7 @@ namespace TestServiceB
 
     using Container = Funq.Container;
 
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {
@@ -35,9 +35,8 @@ namespace TestServiceB
 
         public override void Configure(Container container)
         {
-            // run from a handler path
+            // supports handler subpaths 
             SetConfig(new HostConfig { WebHostUrl = serviceUrl, HandlerFactoryPath = "/api/" });
-
             Plugins.Add(new ConsulFeature());
         }
     }
@@ -48,14 +47,12 @@ namespace TestServiceB
         {
             if (!echo.CallRemoteService)
             {
+                // local call
                 return new EchoBReply { Message = "Hello from service B" };
             }
 
-            // manually assign the Consul.ResolveTypedUrl delegate
-            var client = new JsonServiceClient { TypedUrlResolver = Consul.ResolveTypedUrl };
-
-            // this will resolve the correct remote uri using consul for the external DTO
-            var remoteResponse = client.Post(new EchoA());
+            // call remote service 
+            var remoteResponse = Gateway.Send(new EchoA());
             return new EchoBReply { Message = remoteResponse?.Message };
         }
     }

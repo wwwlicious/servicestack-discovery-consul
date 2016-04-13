@@ -6,15 +6,20 @@ namespace ServiceStack.Discovery.Consul
     using System;
     using System.Collections.Generic;
 
+    using Funq;
+
     using ServiceStack;
+    using ServiceStack.Web;
 
     /// <summary>
     /// Enabled service to service calls by dynamically looking up remote service url
     /// </summary>
     public class ConsulFeature : IPlugin
     {
-        private readonly ServiceClientBase defaultServiceClient;
+        public delegate IServiceGateway DefaultGatewayDelegate(string baseUri);
 
+        private DefaultGatewayDelegate DefaultGateway { get; }
+    
         /// <summary>
         /// Can be used to add tags such as environment to the service registration
         /// </summary>
@@ -27,10 +32,10 @@ namespace ServiceStack.Discovery.Consul
         /// <summary>
         /// Enables service discovery using consul to resolve the correct url for a remote RequestDTO
         /// </summary>
-        /// <param name="defaultServiceClient">If specified, will register a client with IoC for Autowiring</param>
-        public ConsulFeature(ServiceClientBase defaultServiceClient = null)
+        /// <param name="defaultGateway">If specified, will register your preferred client for external calls, defaults to JsonServiceClient</param>
+        public ConsulFeature(DefaultGatewayDelegate defaultGateway = null)
         {
-            this.defaultServiceClient = defaultServiceClient;
+            DefaultGateway = defaultGateway ?? (baseUri => new JsonServiceClient(baseUri));
         }
 
         public bool IncludeDefaultServiceHealth { get; set; } = true;
@@ -48,13 +53,13 @@ namespace ServiceStack.Discovery.Consul
             appHost.OnDisposeCallbacks.Add(UnRegisterService);
             ConsulClient.DiscoveryRequestResolver = DiscoveryTypeResolver;
 
-            // register with IoC if default client specified, otherwise will leave 
-            // implementor to manually register the TypedUrlResolverDelegate
-            if (defaultServiceClient != null)
-            {
-                defaultServiceClient.TypedUrlResolver = Consul.ResolveTypedUrl;
-                appHost.GetContainer().Register<IServiceClient>(defaultServiceClient);
-            }
+            var container = appHost.GetContainer();
+            container
+                .Register<IServiceGatewayFactory>(x => new ConsulServiceGatewayFactory(DefaultGateway, DiscoveryTypeResolver))
+                .ReusedWithin(ReuseScope.None);
+
+            // register plugin link
+            appHost.GetPlugin<MetadataFeature>()?.AddPluginLink(ConsulUris.LocalAgent.CombineWith("ui"), "Consul Agent WebUI");
         }
 
         private void RegisterService(IAppHost host)

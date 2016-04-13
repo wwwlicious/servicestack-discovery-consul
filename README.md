@@ -36,25 +36,26 @@ Add the following to your `AppHost.Configure` method
             HandlerFactoryPath = "/api/"
         });
 
-        // Pass in any ServiceClient and it will be autowired with Func
-        Plugins.Add(new ConsulFeature(new JsonServiceClient()));
+        // Register the plugin, that's it!
+        Plugins.Add(new ConsulFeature());
     }
 }
 ```
-and use as follows
+To call external services, you just call the Gateway and let it handle the routing for you.
 ```csharp
 public class MyService : Service
 {
-    // autowiring will inject configured client
-    public IServiceClient Client { get; set; }
-
     public void Any(RequestDTO dto)
     {
-        // will automatically find the correct uri endpoint for the the request using consul
-        var response = Client.Post(new ExternalDTO { Custom = "bob" });
+        // The gateway will automatically route external requests to the correct service
+        var internalCall = Gateway.Send(new InternalDTO { ... });
+        var externalCall = Gateway.Send(new ExternalDTO { ... });
     }
 }
 ```
+
+It really is that simple!
+
 ## Running your services
 
 Before you start your services, you'll need to [download consul](https://www.consul.io/) and start the agent running on your machine.
@@ -65,23 +66,24 @@ The following will create an in-memory instance which is useful for testing
 ```bash
 consul.exe agent -dev -advertise="127.0.0.1"
 ```
-You should now be able to view the [Consul UI](http://127.0.0.1:8500/ui)
+You should now be able see the [Consul Agent WebUI](http://127.0.0.1:8500/ui) link appear under **Plugins** on the metadata page.
+
+## Under the covers...
 
 ### Automatic Service Registration
 
 ![Automatic Service Registration](assets/ServiceRegistration.png)
 
-Once you have added the plugin to your ServiceStack AppHost, you should see it appear
-in the Consul UI when you start it.
+Once you have added the plugin to your ServiceStack AppHost and started it up, it will set up the following:
 
-* Registers the service with a Consul agent once the AppHost has been initialised.
-* Deregisters the service when the AppHost is shutdown.
+* Registers the service and it's requestDTO's with Consul for other services to be able to find.
+* Deregisters the service when the AppHost is shutdown so that other services get only active services.
 
 #### Health checks
 
 ![Default Health Checks](assets/HealthChecks.png)
 
-Each service can have a number of health checks. This allows service discovery to filter out failing instances of your services.
+Each service can have any number of health checks. These checks are run by Consul and allow service discovery to filter out failing instances of your services.
 
 By default the plugin creates 2 health checks
 
@@ -102,7 +104,6 @@ new ConsulFeature() { ServiceChecks.Add(new ConsulRegisterCheck()) };
 ### Discovery
 
 The default discovery mechanism uses the ServiceStack request type names to resolve all of the services capable of processing the request. This means that you should always use unique names across all your services for each of your RequestDTO's
-
 To override the default behaviour, you can implement your own `IDiscoveryRequestTypeResolver`
 
 ```csharp
@@ -122,33 +123,28 @@ public class CustomDiscoveryRequestTypeResolver : IDiscoveryRequestTypeResolver
 
 #### Autowiring Client
 
-To autowire a client, pass it into the plugin constructor: `new ConsulFeature(new JsvServiceClient())` 
-You can then use an `IServiceClient` in your service and everything will just work 
+To change the default service to service client used or add additional configuration, 
+you can pass this into the plugin constructor as follows: 
+```csharp
+`new ConsulFeature(baseUrl => new JsvServiceClient(baseUrl){ UserName = "custom" })`
+``` 
+You can then use the Gateway as normal and any external call will use your preferred `IServiceGateway` 
 
 ```csharp
 public class EchoService : Service
 {
-    // will autowire the JsvServiceClient passed to the plugin constructor
-    public IServiceClient Client { get; set; }
-
     public void Any(int num)
     {
         // this will resolve the correct remote uri using consul for the external DTO
-        var remoteResponse = Client.Post(new RemoteDTO());
+        var remoteResponse = Gateway.Send(new RemoteDTO());
     }
 }
-```
-#### Manual Client
-
-If you dont want the service client to be autowired, don't pass a client to the plugin constructor and set the following client property
-
-```csharp
-var client = new JsonServiceClient { TypedUrlResolver = Consul.ResolveTypedUrl };
 ```
 
 ### Example
 
-The following shows the services registered with consul and passing health checks and the services running on different IP:Port/Paths
+The following shows the services registered with consul and passing health 
+checks and the services running on different IP:Port/Paths
 
 ![Services](assets/Services.png)
 

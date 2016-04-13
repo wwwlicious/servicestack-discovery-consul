@@ -41,7 +41,8 @@ namespace TestServiceA
                 ApiVersion = "2.0"
             });
 
-            Plugins.Add(new ConsulFeature(new JsvServiceClient()) { IncludeDefaultServiceHealth = false });
+            // use a csv client for our external calls
+            Plugins.Add(new ConsulFeature(uri => new CsvServiceClient(uri)) { IncludeDefaultServiceHealth = false });
             Plugins.Add(new MetadataFeature());
 
             // set up localhost redis to enable health check
@@ -56,15 +57,16 @@ namespace TestServiceA
         /// </summary>
         public IServiceClient Client { get; set; }
 
-        public EchoAReply Any(EchoA echo)
+        public object Any(EchoA echo)
         {
             if (!echo.CallRemoteService)
             {
+                // local call
                 return new EchoAReply { Message = "Hello from service A" };
             }
 
-            // this will resolve the correct remote uri using consul for the external DTO
-            var remoteResponse = Client.Post(new EchoB());
+            // call remote service
+            var remoteResponse = Gateway.Send(new EchoB());
             return new EchoAReply { Message = remoteResponse?.Message };
         }
     }

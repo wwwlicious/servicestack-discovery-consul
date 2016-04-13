@@ -3,27 +3,23 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace ServiceStack.Discovery.Consul.Tests
 {
-    using System;
-
     using FluentAssertions;
 
     using ServiceStack.Testing;
 
     using Xunit;
 
-    [Collection("HeartBeatTests")]
+    [Collection("AppHost collection")]
     public class HeartbeatServiceTests
     {
+        private readonly AppHostFixture fixture;
+
         private readonly HeartbeatService service;
 
-        public HeartbeatServiceTests()
+        public HeartbeatServiceTests(AppHostFixture fixture)
         {
-            if (ServiceStackHost.Instance == null)
-            {
-                var host = new BasicAppHost().Init();
-                host.Container.RegisterAutoWired<HeartbeatService>();
-
-            }
+            fixture.Host.Container.RegisterAutoWired<HeartbeatService>();
+            
             var mockHttpRequest = new MockHttpRequest("Heartbeat", "GET", "json", "heartbeat", null, null, null);
 
             service = new HeartbeatService { Request = mockHttpRequest };

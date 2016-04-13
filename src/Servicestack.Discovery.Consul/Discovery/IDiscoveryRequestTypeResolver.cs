@@ -3,10 +3,14 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace ServiceStack.Discovery.Consul
 {
+    using System;
+
     public interface IDiscoveryRequestTypeResolver
     {
         string[] GetRequestTypes(IAppHost host);
 
         string ResolveBaseUri(object dto);
+
+        string ResolveBaseUri(Type dtoType);
     }
 }
