@@ -75,7 +75,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         [Fact]
         public void CanAddServiceChecks()
         {
-            settings.AddServiceCheck(new ConsulRegisterCheck("checkone", "id1"));
+            settings.AddServiceCheck(new ConsulRegisterCheck("checkone", "id1") { HTTP = "test", IntervalInSeconds = 10 });
 
             var check = settings.GetServiceChecks().Should().ContainSingle().Subject;
             check.Name.Should().Be("checkone");
