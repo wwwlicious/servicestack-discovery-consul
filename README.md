@@ -77,7 +77,7 @@ Once you have added the plugin to your ServiceStack AppHost and started it up, i
 * Registers the service and it's requestDTO's with Consul for other services to be able to find.
 * Deregisters the service when the AppHost is shutdown so that other services get only active services.
 
-#### Health checks
+### Health checks
 
 ![Default Health Checks](assets/HealthChecks.png)
 
@@ -89,16 +89,59 @@ By default the plugin creates 2 health checks
 2. If Redis has been configured in the AppHost, it will check Redis is responding
 
 You can turn off the default health checks by setting the following property:
-```csharp
-Plugins.Add(new ConsulFeature { IncludeDefaultServiceHealth = false });
-```
-#### Custom health checks
-
-You can add your own health checks
 
 ```csharp
-new ConsulFeature() { ServiceChecks.Add(new ConsulRegisterCheck()) };
+new ConsulFeature(settings => { settings.IncludeDefaultServiceHealth = false; });
 ```
+
+### Custom health checks
+
+You can add your own health checks in one of two ways
+
+##### 1. Setting the `ConsulFeature.ServiceHealthCheck` property. 
+
+```csharp
+new ConsulFeature(settings =>
+{
+    settings.AddServiceCheck(host =>
+    {
+        // your code for checking service health
+        if (...failing check)
+            return new HealthCheck(ServiceHealth.Critical, "Out of disk space");
+        if (...warning check)
+            return new HealthCheck(ServiceHealth.Warning, "Query times are slow than expected");
+            
+        ...ok check 
+        return new HealthCheck(ServiceHealth.Ok, "working normally");
+    },
+    intervalInSeconds: 60 // default check once per minute
+    );
+});
+```
+_If an exception is thrown from this
+check, the healthcheck will return **Critical** to consul along with the exception_
+
+##### 2. Specifying HTTP or TCP endpoints
+
+```csharp
+new ConsulFeature(settings =>
+{
+    settings.AddServiceCheck(new ConsulRegisterCheck("httpcheck")
+    {
+        HTTP = "http://myservice/custom/healthcheck",
+        IntervalInSeconds = 60
+    });
+    settings.AddServiceCheck(new ConsulRegisterCheck("tcpcheck")
+    {
+        TCP = "localhost:1234",
+        IntervalInSeconds = 60
+    });
+});
+```
+_http checks must be GET and the health check expects a 200 http status code_
+
+_tcp checks expect an ACK response_
+
 ### Discovery
 
 The default discovery mechanism uses the ServiceStack request types to resolve 
@@ -107,6 +150,12 @@ all of the services capable of processing the request. This means that you shoul
 To override the default behaviour, you can implement your own 
 `IDiscoveryRequestTypeResolver`
 
+```csharp
+new ConsulFeature(settings =>
+{
+    settings.AddDiscoveryTypeResolver(new CustomDiscoveryRequestTypeResolver());
+});
+```
 ```csharp
 public class CustomDiscoveryRequestTypeResolver : IDiscoveryRequestTypeResolver
 {
@@ -122,12 +171,15 @@ public class CustomDiscoveryRequestTypeResolver : IDiscoveryRequestTypeResolver
 }
 ```
 
-#### Configuring the external client
+#### Configuring the external Gateway
 
-To change the default external client used, or just to add additional configuration, 
-you can pass a client delegate into the plugin constructor: 
+To change the default external `IServiceGateway` used, or just to add additional configuration, 
+you can set the following setting: 
 ```csharp
-new ConsulFeature(baseUri => new JsvServiceClient(baseUri) { UserName = "custom" })
+new ConsulFeature(settings =>
+{
+    settings.SetDefaultGateway(baseUri => new JsvServiceClient(baseUri) { UserName = "custom" });
+});
 ``` 
 You can then continue to use the Gateway as normal but any external call will now use your preferred `IServiceGateway` 
 
@@ -140,6 +192,15 @@ public class EchoService : Service
         var remoteResponse = Gateway.Send(new RemoteDTO());
     }
 }
+```
+
+### Tags
+
+you can add your own custom tags to register with consul. This can be useful when you override the
+default 'IDiscoveryTypeResolver' or want to register different regions or environments for services
+
+```csharp
+new ConsulFeature(settings => { settings.AddTags("region-us-east", "region-europe-west", "region-aus-east"); });
 ```
 
 ### Example

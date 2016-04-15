@@ -11,7 +11,7 @@ namespace ServiceStack.Discovery.Consul.Tests
 
     using Xunit;
 
-    [Collection("AppHost collection")]
+    [Collection("AppHost")]
     public class ConsulFeatureTests 
     {
         private readonly AppHostFixture fixture;
@@ -26,7 +26,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         {
             Action action = () => new ConsulFeature().Register(new BasicAppHost());
 
-            action.ShouldThrow<ApplicationException>().Which.Message.Should().Be("appHost.Config.WebHostUrl must be set to use the Consul plugin so that the service can sent it's full http://url:port to Consul");
+            action.ShouldThrow<ApplicationException>().Which.Message.Should().Be("appHost.Config.WebHostUrl must be set to use the Consul plugin, this is so consul will know the full external http://url:port for the service");
         }
 
         [Fact]
@@ -34,7 +34,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         {
             var plugin = new ConsulFeature();
 
-            plugin.ServiceChecks.Should().BeEmpty();
+            plugin.Settings.GetServiceChecks().Should().BeEmpty();
         }
 
         [Fact]
@@ -42,7 +42,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         {
             var plugin = new ConsulFeature();
 
-            plugin.DiscoveryTypeResolver.Should().NotBeNull();
+            plugin.Settings.GetDiscoveryTypeResolver().Should().NotBeNull();
         }
     }
 }

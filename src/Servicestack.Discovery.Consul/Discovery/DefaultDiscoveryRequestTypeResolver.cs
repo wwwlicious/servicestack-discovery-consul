@@ -16,6 +16,7 @@ namespace ServiceStack.Discovery.Consul
             // registered the requestDTO type names for the lookup
             // ignores types based on https://github.com/ServiceStack/ServiceStack/wiki/Add-ServiceStack-Reference#excluding-types-from-add-servicestack-reference
             var nativeTypes = host.GetPlugin<NativeTypesFeature>();
+
             var requestTypes =
                 host.Metadata.RequestTypes
                     .Where(x => x.AllAttributes<ExcludeAttribute>().All(a => a.Feature != Feature.Metadata))
@@ -25,7 +26,7 @@ namespace ServiceStack.Discovery.Consul
                     //.Where(x => x.AllAttributes<RestrictAttribute>().Any(a => a.VisibilityTo == RequestAttributes.External))
                     .ToArray();
 
-            return requestTypes.Select(x => x.Name).ToArray();
+            return requestTypes.Select(x => $"{ConsulFeatureSettings.TagDtoPrefix}{x.Name}").ToArray();
         }
 
         public string ResolveBaseUri(Type dtoType)
@@ -38,9 +39,11 @@ namespace ServiceStack.Discovery.Consul
             {
                 // find services to serve request type
                 var services = JsonObject.Parse(servicesJson)
-                        .Select(x => x.Value.FromJson<ConsulServiceResponse>())
-                        .ToArray();
-                var matches = services.Where(x => x.Tags.Contains(dtoType.Name)).ToArray();
+                    .Select(x => x.Value.FromJson<ConsulServiceResponse>())
+                    .ToArray();
+                var matches = services.Where(
+                    x => x.Tags.Contains("ServiceStack") && x.Tags.Contains($"{ConsulFeatureSettings.TagDtoPrefix}{dtoType.Name}"))
+                    .ToArray();
                 if (matches.Any())
                 {
                     // TODO filter out any unhealthy services
