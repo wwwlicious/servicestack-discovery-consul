@@ -6,8 +6,7 @@ namespace TestServiceB
 {
     using ServiceStack;
 
-    public partial class EchoA
-        : IReturn<EchoAReply>
+    public partial class EchoA : IReturn<EchoAReply>
     {
         public virtual bool CallRemoteService { get; set; }
     }

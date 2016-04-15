@@ -1,6 +1,7 @@
 ﻿// This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 namespace TestServiceA
 {
     using System;
@@ -41,22 +42,26 @@ namespace TestServiceA
                 ApiVersion = "2.0"
             });
 
-            // use a csv client for our external calls
-            Plugins.Add(new ConsulFeature(uri => new CsvServiceClient(uri)) { IncludeDefaultServiceHealth = false });
-            Plugins.Add(new MetadataFeature());
+            Plugins.Add(new ConsulFeature(settings =>
+            {
+                settings.AddServiceCheck(host =>
+                    {
+                        // custom logic for checking service health
+                        // return new HealthCheck(ServiceHealth.Critical, "Out of disk space");
+                        // return new HealthCheck(ServiceHealth.Warning, "Query times are slower than expected");
+                        return new HealthCheck(ServiceHealth.Ok, "working normally");
+                    },
+                    intervalInSeconds: 60);
+                settings.AddTags("one", "two", "three");
+                settings.SetDefaultGateway(url => new CsvServiceClient(url));
+            }));
 
-            // set up localhost redis to enable health check
-            container.Register<IRedisClientsManager>(c => new RedisManagerPool("localhost:6379"));
+            Plugins.Add(new MetadataFeature());
         }
     }
-     
+
     public class EchoService : Service
     {
-        /// <summary>
-        /// uses the client specified in the ConsulFeature constructor
-        /// </summary>
-        public IServiceClient Client { get; set; }
-
         public object Any(EchoA echo)
         {
             if (!echo.CallRemoteService)

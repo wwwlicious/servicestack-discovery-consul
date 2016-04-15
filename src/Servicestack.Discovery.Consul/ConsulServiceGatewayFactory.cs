@@ -8,13 +8,13 @@ namespace ServiceStack.Discovery.Consul
 
     public class ConsulServiceGatewayFactory : ServiceGatewayFactoryBase
     {
-        private readonly ConsulFeature.DefaultGatewayDelegate defaultGateway;
+        private readonly DefaultGatewayDelegate defaultGateway;
 
         private readonly IDiscoveryRequestTypeResolver typeResolver;
 
         public HashSet<Type> LocalTypes { get; set; }
 
-        public ConsulServiceGatewayFactory(ConsulFeature.DefaultGatewayDelegate defaultGateway, IDiscoveryRequestTypeResolver typeResolver)
+        public ConsulServiceGatewayFactory(DefaultGatewayDelegate defaultGateway, IDiscoveryRequestTypeResolver typeResolver)
         {
             defaultGateway.ThrowIfNull(nameof(defaultGateway));
             typeResolver.ThrowIfNull(nameof(typeResolver));
