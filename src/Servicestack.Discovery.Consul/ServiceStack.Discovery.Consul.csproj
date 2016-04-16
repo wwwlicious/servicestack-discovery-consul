@@ -67,14 +67,18 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Checks\HealthCheck.cs" />
     <Compile Include="Checks\Heartbeat.cs" />
-    <Compile Include="Checks\HeartbeatService.cs" />
+    <Compile Include="Checks\HealthCheckService.cs" />
+    <Compile Include="Checks\ServiceHealth.cs" />
     <Compile Include="Consul.cs" />
     <Compile Include="ConsulFeature.cs" />
+    <Compile Include="ConsulFeatureSettings.cs" />
     <Compile Include="ConsulServiceGatewayFactory.cs" />
     <Compile Include="Consul\ConsulRegisterCheck.cs" />
     <Compile Include="Consul\ConsulRegisterCheckValidator.cs" />
@@ -84,6 +88,8 @@
     <Compile Include="Consul\ConsulUris.cs" />
     <Compile Include="Discovery\DefaultDiscoveryRequestTypeResolver.cs" />
     <Compile Include="Discovery\IDiscoveryRequestTypeResolver.cs" />
+    <Compile Include="HostHealthCheck.cs" />
+    <Compile Include="InvalidTagException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ConsulClient.cs" />
   </ItemGroup>

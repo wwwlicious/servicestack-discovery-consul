@@ -5,7 +5,7 @@ namespace ServiceStack.Discovery.Consul.Tests
 {
     using Xunit;
 
-    [Collection("AppHost collection")]
+    [Collection("AppHost")]
     public class ConsulClientTests
     {
         private readonly AppHostFixture fixture;

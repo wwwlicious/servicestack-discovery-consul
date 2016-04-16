@@ -1,7 +1,6 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
 namespace ServiceStack.Discovery.Consul
 {
     using System;
@@ -9,8 +8,9 @@ namespace ServiceStack.Discovery.Consul
     using System.Net;
 
     using ServiceStack;
-    using ServiceStack.Redis;
     using ServiceStack.FluentValidation;
+    using ServiceStack.Logging;
+    using ServiceStack.Redis;
 
     public static class ConsulClient
     {
@@ -27,21 +27,24 @@ namespace ServiceStack.Discovery.Consul
         /// </summary>
         /// <param name="host">the apphost to register with consul</param>
         /// <param name="checks">the health checks to associate with this service</param>
+        /// <param name="healthCheck"></param>
         /// <param name="customTags">adds custom tags to the registration</param>
         /// <param name="includeDefaultServiceHealth"></param>
         /// <returns></returns>
-        public static ConsulServiceRegistration RegisterService(IAppHost host, List<ConsulRegisterCheck> checks, List<string> customTags, bool includeDefaultServiceHealth)
+        public static ConsulServiceRegistration RegisterService(IAppHost host, ConsulRegisterCheck[] checks, HostHealthCheck healthCheck, string[] customTags, bool includeDefaultServiceHealth)
         {
             // get endpoint http://url:port/path and version
             var baseUrl = host.Config.WebHostUrl.CombineWith(host.Config.HandlerFactoryPath);
             var version = "v{0}".Fmt(host.Config?.ApiVersion?.Replace('.', '-'));
+
+            host.RegisterService<HealthCheckService>();
 
             // build tags from request types
             var tags = new List<string> { version, "ServiceStack" };
             tags.AddRange(DiscoveryRequestResolver.GetRequestTypes(host));
             tags.AddRange(customTags);
 
-            var registration = new ConsulServiceRegistration(HostContext.ServiceName, version)
+            var registration = new ConsulServiceRegistration($"ServiceStack-{HostContext.ServiceName}", version)
                                    {
                                         Address = baseUrl,
                                         Tags = tags.ToArray()
@@ -50,7 +53,7 @@ namespace ServiceStack.Discovery.Consul
             ServiceValidator.ValidateAndThrow(registration);
 
             var registrationUrl = ConsulUris.LocalAgent.CombineWith(registration.ToPutUrl());
-            registrationUrl.PostJsonToUrlAsync(registration, null,
+            registrationUrl.PostJsonToUrl(registration, null,
                 response =>
                     {
                         var logger = host.Config.LogFactory.GetLogger(typeof(ConsulClient));
@@ -80,6 +83,16 @@ namespace ServiceStack.Discovery.Consul
                 RegisterHealthCheck(check);
             }
 
+            if (healthCheck != null)
+            {
+                RegisterHealthCheck(new ConsulRegisterCheck("ServiceStack-HealthCheck", registration.ID)
+                {
+                    IntervalInSeconds = healthCheck.IntervalInSeconds,
+                    HTTP = baseUrl.CombineWith("/json/reply/healthcheck"),
+                    Notes = "This check is an HTTP GET request which expects the service to return 200 OK"
+                });
+            }
+
             return registration;
         }
 
@@ -103,14 +116,17 @@ namespace ServiceStack.Discovery.Consul
 
         private static void RegisterHealthCheck(ConsulRegisterCheck check)
         {
-            HealthcheckValidator.ValidateAndThrow(check);
+            var logger = LogManager.GetLogger(typeof(ConsulClient));
+            try
+            {
+                HealthcheckValidator.ValidateAndThrow(check);
 
-            ConsulUris.LocalAgent.CombineWith(check.ToPutUrl()).PostJsonToUrlAsync(
-                check,
-                null,
-                response =>
+                ConsulUris.LocalAgent.CombineWith(check.ToPutUrl()).PostJsonToUrlAsync(
+                    check,
+                    null,
+                    response =>
                     {
-                        var logger = HostConfig.Instance.LogFactory.GetLogger(typeof(ConsulClient));
+                        
                         if (response.IsErrorResponse())
                         {
                             logger.Error($"Could not register health check with Consul. {response.StatusDescription}");
@@ -120,6 +136,11 @@ namespace ServiceStack.Discovery.Consul
                             logger.Info($"Registered health check with Consul {check}");
                         }
                     });
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Failed to register health check", ex);
+            }
         }
 
         /// <summary>
@@ -140,36 +161,48 @@ namespace ServiceStack.Discovery.Consul
         /// <returns>an array of agentservicecheck objects</returns>
         private static ConsulRegisterCheck[] InitDefaultServiceChecks(IAppHost appHost, string baseUrl, string serviceName)
         {
-            var checks = new List<ConsulRegisterCheck>();
-            appHost.RegisterService<HeartbeatService>();
-            var heartbeatCheck = new ConsulRegisterCheck("heartbeat", serviceName)
-            {
-                IntervalInSeconds = 20,
-                HTTP = baseUrl.CombineWith("/json/reply/heartbeat"),
-                Notes = "This check is an HTTP GET request which expects the service to return 200 OK"
-            };
-            checks.Add(heartbeatCheck);
+            var heartbeatCheck = CreateHeartbeatCheck(baseUrl, serviceName);
+            var checks = new List<ConsulRegisterCheck> { heartbeatCheck };
 
             // If redis is setup, add redis health check
             var clientsManager = appHost.TryResolve<IRedisClientsManager>();
             if (clientsManager != null)
             {
-                using (var redisClient = clientsManager.GetReadOnlyClient())
+                try
                 {
-                    if (redisClient != null)
+                    using (var redisClient = clientsManager.GetReadOnlyClient())
                     {
-                        var redisHealthCheck = new ConsulRegisterCheck("redis", serviceName)
+                        if (redisClient != null)
                         {
-                            IntervalInSeconds = 10,
-                            TCP = "{0}:{1}".Fmt(redisClient.Host, redisClient.Port),
-                            Notes =  "This check ensures that redis is responding correctly"
-                        };
-                        checks.Add(redisHealthCheck);
+                            var redisHealthCheck = new ConsulRegisterCheck("ServiceStack-Redis", serviceName)
+                            {
+                                IntervalInSeconds = 10,
+                                TCP = "{0}:{1}".Fmt(redisClient.Host, redisClient.Port),
+                                Notes = "This check ensures that redis is responding correctly"
+                            };
+                            checks.Add(redisHealthCheck);
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    LogManager.GetLogger(typeof(ConsulClient)).Error("Could not create a redis connection from the registered IRedisClientsManager, skipping consul health check", ex);
                 }
             }
 
+            // TODO Setup health checks for any registered IDbConnectionFactories
+
             return checks.ToArray();
+        }
+
+        private static ConsulRegisterCheck CreateHeartbeatCheck(string baseUrl, string serviceName)
+        {
+            return new ConsulRegisterCheck("ServiceStack-HeartBeat", serviceName)
+            {
+                IntervalInSeconds = 30,
+                HTTP = baseUrl.CombineWith("/json/reply/heartbeat"),
+                Notes = "A heartbeat service to check if the service is reachable, expects 200 response"
+            };
         }
     }
 }

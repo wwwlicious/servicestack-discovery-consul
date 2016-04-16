@@ -84,6 +84,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConsulFeatureSettingsTests.cs" />
+    <Compile Include="ConsulUrisTests.cs" />
+    <Compile Include="DefaultDiscoveryRequestTypeResolverTests.cs" />
+    <Compile Include="Helpers\AppHostCollection.cs" />
     <Compile Include="ConsulClientTests.cs" />
     <Compile Include="Helpers\AppHostFixture.cs" />
     <Compile Include="ConsulFeatureTests.cs" />
@@ -91,8 +95,9 @@
     <Compile Include="ConsulServiceGatewayFactoryTests.cs" />
     <Compile Include="ConsulServiceRegistrationTests.cs" />
     <Compile Include="ConsulTests.cs" />
-    <Compile Include="HeartbeatServiceTests.cs" />
+    <Compile Include="HealthCheckServiceTests.cs" />
     <Compile Include="Helpers\TestDiscovery.cs" />
+    <Compile Include="HostHealthCheckTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

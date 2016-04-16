@@ -10,15 +10,7 @@ namespace ServiceStack.Discovery.Consul.Tests
 
     using Xunit;
 
-    [CollectionDefinition("AppHost collection")]
-    public class AppHostCollection : ICollectionFixture<AppHostFixture>
-    {
-        // marker class for tests that require apphost.init
-        // http://xunit.github.io/docs/shared-context.html
-    }
-
-
-    [Collection("AppHost collection")]
+    [Collection("AppHost")]
     public class ConsulServiceGatewayFactoryTests
     {
         [Fact]

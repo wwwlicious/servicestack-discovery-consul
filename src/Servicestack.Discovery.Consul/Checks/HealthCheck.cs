@@ -6,8 +6,16 @@ namespace ServiceStack.Discovery.Consul
     using ServiceStack.DataAnnotations;
 
     [Exclude(Feature.Metadata)]
-    public class Heartbeat
+    public class HealthCheck
     {
-        public string Url { get; set; }
+        public HealthCheck(ServiceHealth status = ServiceHealth.Ok, string message = null)
+        {
+            HealthResult = status;
+            Message = message ?? status.ToString();
+        }
+
+        public ServiceHealth HealthResult { get; set; }
+
+        public string Message { get; set; }
     }
 }
