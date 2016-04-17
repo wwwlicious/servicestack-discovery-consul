@@ -115,7 +115,7 @@ namespace ServiceStack.Discovery.Consul.Tests
                 action.ShouldThrow<GatewayServiceDiscoveryException>()
                     .WithMessage("No healthy services are currently registered to process the request of type 'one'")
                     .WithInnerException<WebServiceException>()
-                    .WithInnerMessage("Expected json but received empty or null reponse from http://127.0.0.1:8500/v1/health/service/SS-S1?near=_agent&passing=true&tag=req-one");
+                    .WithInnerMessage("Expected json but received empty or null reponse from http://127.0.0.1:8500/v1/health/service/SS-S1?near=_agent&passing&tag=req-one");
             }
         }
 
@@ -130,7 +130,7 @@ namespace ServiceStack.Discovery.Consul.Tests
                     {
                         return @"{""SS-S1"":[""req-EchoA"", ""ServiceStack""],""SS-S2"":[""req-two"", ""ServiceStack""],}";
                     }
-                    if (request.RequestUri.AbsoluteUri == "http://127.0.0.1:8500/v1/health/service/SS-S1?near=_agent&passing=true&tag=req-EchoA")
+                    if (request.RequestUri.AbsoluteUri == "http://127.0.0.1:8500/v1/health/service/SS-S1?near=_agent&passing&tag=req-EchoA")
                     {
                         return
                             @"[{""Node"":{""Node"":""X1-Win10"",""Address"":""127.0.0.1"",""TaggedAddresses"":{""wan"":""127.0.0.1""},""CreateIndex"":3,""ModifyIndex"":1612},""Service"":{""ID"":""SS-ServiceAv2-0"",""Service"":""SS-ServiceA"",""Tags"":[""v2-0"",""ServiceStack"",""req-EchoA"",""one"",""two"",""three""],""Address"":""http://127.0.0.1:8091/"",""Port"":0,""EnableTagOverride"":false,""CreateIndex"":1607,""ModifyIndex"":1612},""Checks"":[{""Node"":""X1-Win10"",""CheckID"":""serfHealth"",""Name"":""Serf Health Status"",""Status"":""passing"",""Notes"":"""",""Output"":""Agent alive and reachable"",""ServiceID"":"""",""ServiceName"":"""",""CreateIndex"":3,""ModifyIndex"":3},{""Node"":""X1-Win10"",""CheckID"":""SS-ServiceAv2-0:SS-HealthCheck"",""Name"":""SS-HealthCheck"",""Status"":""passing"",""Notes"":""This check is an HTTP GET request which expects the service to return 200 OK"",""Output"":"""",""ServiceID"":""SS-ServiceAv2-0"",""ServiceName"":""SS-ServiceA"",""CreateIndex"":1609,""ModifyIndex"":1612},{""Node"":""X1-Win10"",""CheckID"":""SS-ServiceAv2-0:SS-HeartBeat"",""Name"":""SS-HeartBeat"",""Status"":""passing"",""Notes"":""A heartbeat service to check if the service is reachable, expects 200 response"",""Output"":"""",""ServiceID"":""SS-ServiceAv2-0"",""ServiceName"":""SS-ServiceA"",""CreateIndex"":1608,""ModifyIndex"":1611}]}]";
