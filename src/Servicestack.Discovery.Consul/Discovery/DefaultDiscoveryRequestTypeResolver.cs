@@ -7,14 +7,14 @@ namespace ServiceStack.Discovery.Consul
     using System.Linq;
 
     using ServiceStack.DataAnnotations;
-    using ServiceStack.Text;
 
     public class DefaultDiscoveryRequestTypeResolver : IDiscoveryRequestTypeResolver
     {
         public string[] GetRequestTypes(IAppHost host)
         {
             // registered the requestDTO type names for the lookup
-            // ignores types based on https://github.com/ServiceStack/ServiceStack/wiki/Add-ServiceStack-Reference#excluding-types-from-add-servicestack-reference
+            // ignores types based on 
+            // https://github.com/ServiceStack/ServiceStack/wiki/Add-ServiceStack-Reference#excluding-types-from-add-servicestack-reference
             var nativeTypes = host.GetPlugin<NativeTypesFeature>();
 
             var requestTypes =
@@ -31,32 +31,13 @@ namespace ServiceStack.Discovery.Consul
 
         public string ResolveBaseUri(Type dtoType)
         {
-            // strategy (filter out critical, perfer health over warning), 
-            // TODO include acltoken filtering
-            // NOTE can use consul query to make a single call can find criteria (tag match and healthy vs warning services)
-            var servicesJson = ConsulUris.GetServices.GetJsonFromUrl();
-            try
-            {
-                // find services to serve request type
-                var services = JsonObject.Parse(servicesJson)
-                    .Select(x => x.Value.FromJson<ConsulServiceResponse>())
-                    .ToArray();
-                var matches = services.Where(
-                    x => x.Tags.Contains("ServiceStack") && x.Tags.Contains($"{ConsulFeatureSettings.TagDtoPrefix}{dtoType.Name}"))
-                    .ToArray();
-                if (matches.Any())
-                {
-                    // TODO filter out any unhealthy services
-                    return matches.First().Address;
-                }
-                return null;
-            }
-            catch (Exception e)
-            {
-                Logging.LogManager.GetLogger(typeof(ConsulClient)).Error($"Could not find service for {dtoType.Name}", e);
-                throw;
-            }
+            // handles all tag matching, healthy and lowest round trip time (rtt)
+            // throws GatewayServiceDiscoveryException back to the Gateway 
+            // to allow retry/exception handling at call site
+            // TODO optional extra: set polly exception retry policy
+            return ConsulClient.GetService(dtoType.Name)?.Address;
         }
+
         public string ResolveBaseUri(object dto)
         {
             return ResolveBaseUri(dto.GetType());

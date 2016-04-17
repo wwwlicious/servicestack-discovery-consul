@@ -7,11 +7,11 @@ using Xunit;
 namespace ServiceStack.Discovery.Consul.Tests
 {
     [Collection("AppHost")]
-    public class DefaultDiscoveryRequestTypeResolverTests
+    public class GatewayServiceDiscoveryExceptionpeResolverTests
     {
         private readonly AppHostFixture fixture;
 
-        public DefaultDiscoveryRequestTypeResolverTests(AppHostFixture fixture)
+        public GatewayServiceDiscoveryExceptionpeResolverTests(AppHostFixture fixture)
         {
             this.fixture = fixture;
         }

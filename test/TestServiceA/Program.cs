@@ -55,8 +55,6 @@ namespace TestServiceA
                 settings.AddTags("one", "two", "three");
                 settings.SetDefaultGateway(url => new CsvServiceClient(url));
             }));
-
-            Plugins.Add(new MetadataFeature());
         }
     }
 

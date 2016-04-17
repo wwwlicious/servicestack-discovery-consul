@@ -11,6 +11,10 @@ namespace ServiceStack.Discovery.Consul
 
         public static readonly Func<string, string> DeregisterService = serviceId => $"{LocalAgent}/v1/agent/service/deregister/{serviceId}";
 
-        public static readonly string GetServices = $"{LocalAgent}/v1/agent/services";
+        /// <summary>
+        /// Uri for retrieving a list of services 
+        /// </summary>
+        /// <remarks><see cref="https://www.consul.io/docs/agent/http/catalog.html#catalog_services"/></remarks>
+        public static readonly string GetServices = $"{LocalAgent}/v1/catalog/services?near=_agent";
     }
 }
