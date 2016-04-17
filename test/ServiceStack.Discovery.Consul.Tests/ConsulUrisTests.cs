@@ -12,7 +12,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         [Fact]
         public void GetServicesUri_IsCorrect()
         {
-            ConsulUris.GetServices.Should().Be("http://127.0.0.1:8500/v1/agent/services");
+            ConsulUris.GetServices.Should().Be("http://127.0.0.1:8500/v1/catalog/services?near=_agent");
         }
 
         [Fact]

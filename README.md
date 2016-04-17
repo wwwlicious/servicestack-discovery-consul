@@ -2,11 +2,22 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/55830emag9ksyasf/branch/master?svg=true)](https://ci.appveyor.com/project/wwwlicious/servicestack-discovery-consul)
 [![NuGet version](https://badge.fury.io/nu/ServiceStack.Discovery.Consul.svg)](https://badge.fury.io/nu/ServiceStack.Discovery.Consul)
 
-A plugin for [ServiceStack](https://servicestack.net/) that provides transparent service discovery using [Consul.io](http://consul.io) with automatic service registration and health checking.
+A plugin for [ServiceStack](https://servicestack.net/) that provides 
+transparent [client service discovery](http://microservices.io/patterns/client-side-discovery.html) 
+using [Consul.io](http://consul.io) as a [Service Registry](http://microservices.io/patterns/service-registry.html)
 
-This enables your servicestack instances to call one another, without either knowing where the other is, based solely on a copy of the requestDTO. Your services will not need to take any dependencies on each other and as you deploy updates to your services they will automatically be registered and used without reconfiguing the existing services.
+This enables distributed servicestack instances to call one another, 
+without either knowing where the other is, based solely on a 
+copy of the .Net CLR request type. 
 
-The customisable health checks for each service will also ensure that failing services will not be used, or if you run multiple instances of a service, only the healthy and most responsive service will be returned. 
+Your services will not need to take **any dependencies** on each other 
+and as you deploy updates to your services they will **automatically be registered** 
+and used without reconfiguing the existing services.
+
+The automatic and customisable health checks for each service will 
+also ensure that **failing services will not be used**, or if you 
+run multiple instances of a service, only the healthy and **most responsive** 
+service will be returned. 
 
 ![RequestDTO Service Discovery](assets/RequestDTOServiceDiscovery.png)
 
@@ -72,10 +83,11 @@ You should now be able see the [Consul Agent WebUI](http://127.0.0.1:8500/ui) li
 
 ![Automatic Service Registration](assets/ServiceRegistration.png)
 
-Once you have added the plugin to your ServiceStack AppHost and started it up, it will set up the following:
+Once you have added the plugin to your ServiceStack AppHost and 
+started it up, it will [self-register](http://microservices.io/patterns/self-registration.html):
 
-* Registers the service and it's requestDTO's with Consul for other services to be able to find.
-* Deregisters the service when the AppHost is shutdown so that other services get only active services.
+* AppHost.AfterInit - Registers the service and it's operations in the service registry.
+* AppHost.OnDispose - Deregisters the service when the AppHost is shutdown.
 
 ### Health checks
 
@@ -98,7 +110,7 @@ new ConsulFeature(settings => { settings.IncludeDefaultServiceHealth = false; })
 
 You can add your own health checks in one of two ways
 
-##### 1. Setting the `ConsulFeature.ServiceHealthCheck` property. 
+#### 1. Define your own health check delegate. 
 
 ```csharp
 new ConsulFeature(settings =>
@@ -121,7 +133,7 @@ new ConsulFeature(settings =>
 _If an exception is thrown from this
 check, the healthcheck will return **Critical** to consul along with the exception_
 
-##### 2. Specifying HTTP or TCP endpoints
+#### 2. Specifying HTTP or TCP endpoints
 
 ```csharp
 new ConsulFeature(settings =>
@@ -171,7 +183,7 @@ public class CustomDiscoveryRequestTypeResolver : IDiscoveryRequestTypeResolver
 }
 ```
 
-#### Configuring the external Gateway
+### Configuring the external Gateway
 
 To change the default external `IServiceGateway` used, or just to add additional configuration, 
 you can set the following setting: 
