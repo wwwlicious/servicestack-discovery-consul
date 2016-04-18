@@ -18,7 +18,8 @@ namespace ServiceStack.Discovery.Consul.Tests
 
         public string[] GetRequestTypes(IAppHost host)
         {
-            return DtoTypes.Keys.Select(x => x.GetType().Name).ToArray();
+            ExportTypes = DtoTypes.Keys.ToHashSet();
+            return ExportTypes.Select(x => x.Name).ToArray();
         }
 
         public string ResolveBaseUri(object dto)
@@ -30,5 +31,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         {
             return DtoTypes.ContainsKey(dtoType) ? DtoTypes[dtoType] : null;
         }
+
+        public HashSet<Type> ExportTypes { get; private set; }
     }
 }

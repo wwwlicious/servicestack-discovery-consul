@@ -38,6 +38,10 @@ namespace ServiceStack.Discovery.Consul
         {
             // get endpoint http://url:port/path and version
             var baseUrl = host.Config.WebHostUrl.CombineWith(host.Config.HandlerFactoryPath);
+            var requestTypes = DiscoveryRequestResolver.GetRequestTypes(host);
+
+            // TODO Generate warnings if dto's have [Restrict(RequestAttributes.Secure)] 
+            // but are being registered without an https:// baseUri
 
             // TODO for sorting by versioning to work, any registered version tag must be numeric
             // option 1: use ApiVersion but throw exception to stop host if it is not numeric
@@ -46,10 +50,10 @@ namespace ServiceStack.Discovery.Consul
             var version = "v{0}".Fmt(host.Config?.ApiVersion?.Replace('.', '-'));
 
             host.RegisterService<HealthCheckService>();
-
+            
             // build tags from request types
             var tags = new List<string> { version, "ServiceStack" };
-            tags.AddRange(DiscoveryRequestResolver.GetRequestTypes(host));
+            tags.AddRange(requestTypes);
             tags.AddRange(customTags);
 
             var registration = new ConsulServiceRegistration($"SS-{HostContext.ServiceName}", version)
