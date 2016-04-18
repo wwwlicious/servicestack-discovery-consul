@@ -12,7 +12,7 @@ namespace ServiceStack.Discovery.Consul
     /// This service creates health endpoints for consul to issue requests to
     /// </summary>
     /// <remarks>The heartbeat is executed when this service is registered to obtain the baseUrl</remarks>
-    [Exclude(Feature.Metadata)]
+    [Restrict(VisibilityTo = RequestAttributes.None)]
     public class HealthCheckService : Service
     {
         /// <summary>

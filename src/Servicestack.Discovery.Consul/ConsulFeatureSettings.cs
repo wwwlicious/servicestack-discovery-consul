@@ -11,6 +11,9 @@ namespace ServiceStack.Discovery.Consul
 
     public class ConsulFeatureSettings
     {
+        /// <summary>
+        /// Prefix used when registering and looking up requestDTO's
+        /// </summary>
         public const string TagDtoPrefix = "req-";
 
         private readonly List<string> customTags = new List<string>();
@@ -23,10 +26,13 @@ namespace ServiceStack.Discovery.Consul
 
         private DefaultGatewayDelegate defaultGateway = baseUri => new JsonServiceClient(baseUri);
 
+        /// <summary>
+        /// Set to false to exclude adding the default health checks on service registration
+        /// </summary>
         public bool IncludeDefaultServiceHealth { get; set; } = true;
         
         /// <summary>
-        /// Add service tags
+        /// Add custom service tags to your service registration
         /// </summary>
         /// <param name="tags"></param>
         public void AddTags(params string[] tags)
@@ -83,26 +89,46 @@ namespace ServiceStack.Discovery.Consul
             defaultGateway = externalGateway;
         }
 
+        /// <summary>
+        /// Get's the preferred external gateway for service discovery
+        /// </summary>
+        /// <returns></returns>
         public DefaultGatewayDelegate GetGateway()
         {
             return defaultGateway;
         }
 
+        /// <summary>
+        /// Gets the list of custom tags registered with the service
+        /// </summary>
+        /// <returns></returns>
         public string[] GetCustomTags()
         {
             return customTags.ToArray();
         }
 
+        /// <summary>
+        /// Gets the custom health check delegate for the service registration
+        /// </summary>
+        /// <returns></returns>
         public HostHealthCheck GetHealthCheck()
         {
             return healthCheck;
         }
 
+        /// <summary>
+        /// Gets the custom service checks for the service registration
+        /// </summary>
+        /// <returns></returns>
         public ConsulRegisterCheck[] GetServiceChecks()
         {
             return serviceChecks.ToArray();
         }
 
+        /// <summary>
+        /// Gets the type resolver used for service discovery
+        /// </summary>
+        /// <returns></returns>
         public IDiscoveryRequestTypeResolver GetDiscoveryTypeResolver()
         {
             return typeResolver;

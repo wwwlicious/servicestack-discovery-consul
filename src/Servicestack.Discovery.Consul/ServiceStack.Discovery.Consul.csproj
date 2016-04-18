@@ -80,6 +80,7 @@
     <Compile Include="ConsulFeature.cs" />
     <Compile Include="ConsulFeatureSettings.cs" />
     <Compile Include="ConsulServiceGatewayFactory.cs" />
+    <Compile Include="Consul\ConsulCatalogServiceResponse.cs" />
     <Compile Include="Consul\ConsulRegisterCheck.cs" />
     <Compile Include="Consul\ConsulRegisterCheckValidator.cs" />
     <Compile Include="Consul\ConsulRegisterServiceValidator.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="Consul\ConsulServiceResponse.cs" />
     <Compile Include="Consul\ConsulUris.cs" />
     <Compile Include="Discovery\DefaultDiscoveryRequestTypeResolver.cs" />
+    <Compile Include="Discovery\GatewayServiceDiscoveryException.cs" />
     <Compile Include="Discovery\IDiscoveryRequestTypeResolver.cs" />
     <Compile Include="HostHealthCheck.cs" />
     <Compile Include="InvalidTagException.cs" />

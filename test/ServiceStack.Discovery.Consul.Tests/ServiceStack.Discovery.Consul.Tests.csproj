@@ -86,7 +86,7 @@
   <ItemGroup>
     <Compile Include="ConsulFeatureSettingsTests.cs" />
     <Compile Include="ConsulUrisTests.cs" />
-    <Compile Include="DefaultDiscoveryRequestTypeResolverTests.cs" />
+    <Compile Include="GatewayServiceDiscoveryExceptionpeResolverTests.cs" />
     <Compile Include="Helpers\AppHostCollection.cs" />
     <Compile Include="ConsulClientTests.cs" />
     <Compile Include="Helpers\AppHostFixture.cs" />

@@ -48,7 +48,7 @@ namespace ServiceStack.Discovery.Consul.Tests
             res.Should().BeOfType<Heartbeat>().Which.Url.Should().Be("http://localhost");
         }
 
-        [Fact(Skip = "Working locally, failing on appveyor, needs investigation")]
+        [Fact(Skip = "This test appears to share state with the one below on Appveyor, not sure if its appveyor test runner or bug in code, works on my machine!")]
         public void HealthCheck_Should_Return_200()
         {
             var req = new HealthCheck();
