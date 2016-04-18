@@ -90,6 +90,7 @@
     <Compile Include="Discovery\DefaultDiscoveryRequestTypeResolver.cs" />
     <Compile Include="Discovery\GatewayServiceDiscoveryException.cs" />
     <Compile Include="Discovery\IDiscoveryRequestTypeResolver.cs" />
+    <Compile Include="Discovery\TypeExtensions.cs" />
     <Compile Include="HostHealthCheck.cs" />
     <Compile Include="InvalidTagException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -156,6 +156,28 @@ _tcp checks expect an ACK response_
 
 ### Discovery
 
+#### Excluding RequestDTO's
+
+If there are types that you want to exclude from being registered 
+for discovery by other services, you can use one of the following options:
+
+The `ExcludeAttribute` : `Feature.Metadata` or `Feature.ServiceDiscovery` are not registered
+
+```csharp
+[Exclude(Feature.ServiceDiscovery | Feature.Metadata)]
+public class MyInternalDto { ... }
+```
+
+The `RestrictAttribute`. Any type that does not allow `RestrictAttribute.External` will be excluded.
+See the [documentation](https://github.com/ServiceStack/ServiceStack/wiki/Restricting-Services) for more details
+
+```csharp
+[Restrict(RequestAttributes.External)]
+public class MyInternalDto { ... }
+```
+
+#### Customisable discovery
+
 The default discovery mechanism uses the ServiceStack request types to resolve 
 all of the services capable of processing the request. This means that you should 
 **always use unique request names** across all your services for each of your RequestDTO's
@@ -185,14 +207,17 @@ public class CustomDiscoveryRequestTypeResolver : IDiscoveryRequestTypeResolver
 
 ### Configuring the external Gateway
 
-To change the default external `IServiceGateway` used, or just to add additional configuration, 
+By default a `JsonServiceClient` is used for all external `Gateway` requests. 
+To change this default, or just to add additional client configuration, 
 you can set the following setting: 
+
 ```csharp
 new ConsulFeature(settings =>
 {
     settings.SetDefaultGateway(baseUri => new JsvServiceClient(baseUri) { UserName = "custom" });
 });
 ``` 
+
 You can then continue to use the Gateway as normal but any external call will now use your preferred `IServiceGateway` 
 
 ```csharp
@@ -200,8 +225,8 @@ public class EchoService : Service
 {
     public void Any(int num)
     {
-        // this will resolve the correct remote uri using consul for the external DTO
-        var remoteResponse = Gateway.Send(new RemoteDTO());
+        // this will use the JsvServiceClient to send the external DTO
+        var remoteResponse = Gateway.Send(new ExternalDTO());
     }
 }
 ```
