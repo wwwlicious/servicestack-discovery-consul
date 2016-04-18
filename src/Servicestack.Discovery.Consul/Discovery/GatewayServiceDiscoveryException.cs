@@ -5,6 +5,7 @@ namespace ServiceStack.Discovery.Consul
 {
     using System;
 
+    [Serializable]
     public class GatewayServiceDiscoveryException : WebServiceException
     {
         public GatewayServiceDiscoveryException(string message, Exception innerException) : base(message, innerException)

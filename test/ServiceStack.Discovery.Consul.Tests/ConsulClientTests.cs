@@ -4,7 +4,10 @@
 namespace ServiceStack.Discovery.Consul.Tests
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using FluentAssertions;
+    using ServiceStack.DataAnnotations;
     using Xunit;
 
     [Collection("AppHost")]

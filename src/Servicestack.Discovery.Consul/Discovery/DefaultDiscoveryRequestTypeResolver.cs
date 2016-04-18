@@ -4,12 +4,13 @@
 namespace ServiceStack.Discovery.Consul
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
-
-    using ServiceStack.DataAnnotations;
 
     public class DefaultDiscoveryRequestTypeResolver : IDiscoveryRequestTypeResolver
     {
+        public HashSet<Type> ExportTypes { get; private set; }
+
         public string[] GetRequestTypes(IAppHost host)
         {
             // registered the requestDTO type names for the lookup
@@ -17,18 +18,22 @@ namespace ServiceStack.Discovery.Consul
             // https://github.com/ServiceStack/ServiceStack/wiki/Add-ServiceStack-Reference#excluding-types-from-add-servicestack-reference
             var nativeTypes = host.GetPlugin<NativeTypesFeature>();
 
-            var requestTypes =
+            ExportTypes =
                 host.Metadata.RequestTypes
-                    .Where(x => x.AllAttributes<ExcludeAttribute>().All(a => a.Feature != Feature.Metadata))
-                    .Where(x => !nativeTypes.MetadataTypesConfig.IgnoreTypes.Contains(x))
-                    .Where(x => !nativeTypes.MetadataTypesConfig.IgnoreTypesInNamespaces.Contains(x.Namespace))
-                    // TODO Respect the RestrictAttribute
-                    //.Where(x => x.AllAttributes<RestrictAttribute>().Any(a => a.VisibilityTo == RequestAttributes.External))
-                    .ToArray();
-
-            return requestTypes.Select(x => $"{ConsulFeatureSettings.TagDtoPrefix}{x.Name}").ToArray();
+                    .WithServiceDiscoveryAllowed()
+                    .WithoutNativeTypes(nativeTypes)
+                    .WithoutExternalRestrictions()
+                    .ToHashSet();
+                    
+            return ExportTypes.Select(x => $"{ConsulFeatureSettings.TagDtoPrefix}{x.Name}").ToArray(); 
         }
 
+        /// <summary>
+        /// handles all tag matching, healthy and lowest round trip time (rtt)
+        /// </summary>
+        /// <exception cref="GatewayServiceDiscoveryException">If service is not found or unavailable</exception>
+        /// <param name="dtoType">The request DTO type</param>
+        /// <returns>the uri for the service to send the request to</returns>
         public string ResolveBaseUri(Type dtoType)
         {
             // handles all tag matching, healthy and lowest round trip time (rtt)
@@ -38,6 +43,12 @@ namespace ServiceStack.Discovery.Consul
             return ConsulClient.GetService(dtoType.Name)?.Address;
         }
 
+        /// <summary>
+        /// handles all tag matching, healthy and lowest round trip time (rtt)
+        /// </summary>
+        /// <exception cref="GatewayServiceDiscoveryException">If service is not found or unavailable</exception>
+        /// <param name="dto">The request DTO</param>
+        /// <returns>the uri for the service to send the request to</returns>
         public string ResolveBaseUri(object dto)
         {
             return ResolveBaseUri(dto.GetType());

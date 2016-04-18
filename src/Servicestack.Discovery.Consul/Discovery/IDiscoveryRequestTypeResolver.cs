@@ -4,6 +4,7 @@
 namespace ServiceStack.Discovery.Consul
 {
     using System;
+    using System.Collections.Generic;
 
     public interface IDiscoveryRequestTypeResolver
     {
@@ -28,5 +29,10 @@ namespace ServiceStack.Discovery.Consul
         /// <param name="dtoType">The request dto type</param>
         /// <returns>the BaserUri that will serve this request</returns>
         string ResolveBaseUri(Type dtoType);
+
+        /// <summary>
+        /// The requestDTO types that will be registered
+        /// </summary>
+        HashSet<Type> ExportTypes { get; }
     }
 }
