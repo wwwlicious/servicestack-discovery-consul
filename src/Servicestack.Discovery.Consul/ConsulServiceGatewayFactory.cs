@@ -4,6 +4,7 @@
 namespace ServiceStack.Discovery.Consul
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
 
     public class ConsulServiceGatewayFactory : ServiceGatewayFactoryBase
@@ -11,6 +12,8 @@ namespace ServiceStack.Discovery.Consul
         private readonly DefaultGatewayDelegate defaultGateway;
 
         private readonly IDiscoveryRequestTypeResolver typeResolver;
+
+        private readonly ConcurrentDictionary<string, HttpCacheEntry> sharedCache = new ConcurrentDictionary<string, HttpCacheEntry>();
 
         public HashSet<Type> LocalTypes { get; set; }
 
@@ -35,7 +38,15 @@ namespace ServiceStack.Discovery.Consul
                 throw new WebServiceException($"Could not resolve the uri in consul for external requestType {requestType.Name}");
             }
 
-            return defaultGateway(baseUri);
+            // gateway creation delegate
+            var serviceGateway = defaultGateway(baseUri);
+            
+            // return if delegate is already using cachedclient
+            if (serviceGateway is CachedServiceClient) return serviceGateway;
+
+            // is http based client, if so, create cached client and use shared internal cache
+            var serviceClient = serviceGateway as ServiceClientBase;
+            return serviceClient == null ? serviceGateway : serviceClient.WithCache(sharedCache);
         }
     }
 }
