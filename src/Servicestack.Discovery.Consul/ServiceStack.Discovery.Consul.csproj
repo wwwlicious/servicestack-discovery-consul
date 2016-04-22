@@ -80,7 +80,6 @@
     <Compile Include="ConsulFeature.cs" />
     <Compile Include="ConsulFeatureSettings.cs" />
     <Compile Include="ConsulServiceGatewayFactory.cs" />
-    <Compile Include="ConsulTag.cs" />
     <Compile Include="Consul\ConsulCatalogServiceResponse.cs" />
     <Compile Include="Consul\ConsulRegisterCheck.cs" />
     <Compile Include="Consul\ConsulRegisterCheckValidator.cs" />
