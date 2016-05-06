@@ -3,7 +3,10 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/. 
 namespace ServiceStack.Discovery.Consul
 {
+    using ServiceStack.DataAnnotations;
+
     [Route("/discovery/services/{DtoName}", "GET")]
+    [Exclude(Feature.Metadata | Feature.ServiceDiscovery)]
     public class GetService : IReturn<GetServiceResponse>, IGet
     {
         public string DtoName { get; set; }

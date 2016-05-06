@@ -1,6 +1,9 @@
 namespace ServiceStack.Discovery.Consul
 {
+    using ServiceStack.DataAnnotations;
+
     [Route("/discovery/registration")]
+    [Exclude(Feature.Metadata | Feature.ServiceDiscovery)]
     public class ServiceRegistration : IReturn<ServiceRegistration>, IGet
     {
         public string Name { get; set; }

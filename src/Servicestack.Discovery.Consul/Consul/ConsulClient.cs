@@ -10,7 +10,6 @@ namespace ServiceStack.Discovery.Consul
     using ServiceStack;
     using ServiceStack.FluentValidation;
     using ServiceStack.Logging;
-    using ServiceStack.Text;
 
     /// <summary>
     /// Consul client deals with consul api calls
@@ -161,8 +160,9 @@ namespace ServiceStack.Discovery.Consul
                     };
                     HealthcheckValidator.ValidateAndThrow(consulCheck);
 
-                    ConsulUris.LocalAgent.CombineWith(check.ToPutUrl()).PostJsonToUrlAsync(
-                        check,
+                    var registerUrl = consulCheck.ToPutUrl();
+                    ConsulUris.LocalAgent.CombineWith(registerUrl).PutJsonToUrl(
+                        consulCheck,
                         null,
                         response =>
                         {
