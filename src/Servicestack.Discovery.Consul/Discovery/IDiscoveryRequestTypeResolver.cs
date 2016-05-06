@@ -12,9 +12,9 @@ namespace ServiceStack.Discovery.Consul
         /// Inspects the IAppHost and returns a list of strings that will represent the RequestDTO types
         /// These strings are used by <see cref="ResolveBaseUri(object)"/> to find the AppHost's BaseUri
         /// </summary>
-        /// <param name="host"></param>
-        /// <returns></returns>
-        string[] GetRequestTypes(IAppHost host);
+        /// <param name="host">the apphost</param>
+        /// <returns>list of types to register for discovery</returns>
+        HashSet<Type> GetRequestTypes(IAppHost host);
 
         /// <summary>
         /// Takes a dto object and returns the correct BaserUri for the gateway to send it to
@@ -29,10 +29,5 @@ namespace ServiceStack.Discovery.Consul
         /// <param name="dtoType">The request dto type</param>
         /// <returns>the BaserUri that will serve this request</returns>
         string ResolveBaseUri(Type dtoType);
-
-        /// <summary>
-        /// The requestDTO types that will be registered
-        /// </summary>
-        HashSet<Type> ExportTypes { get; }
     }
 }

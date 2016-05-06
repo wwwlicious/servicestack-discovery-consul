@@ -5,27 +5,23 @@ namespace ServiceStack.Discovery.Consul
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
 
     public class DefaultDiscoveryRequestTypeResolver : IDiscoveryRequestTypeResolver
     {
-        public HashSet<Type> ExportTypes { get; private set; }
+        public IDiscovery Discovery { get; set; }
 
-        public string[] GetRequestTypes(IAppHost host)
+        public HashSet<Type> GetRequestTypes(IAppHost host)
         {
             // registered the requestDTO type names for the lookup
             // ignores types based on 
             // https://github.com/ServiceStack/ServiceStack/wiki/Add-ServiceStack-Reference#excluding-types-from-add-servicestack-reference
             var nativeTypes = host.GetPlugin<NativeTypesFeature>();
 
-            ExportTypes =
+            return 
                 host.Metadata.RequestTypes
                     .WithServiceDiscoveryAllowed()
                     .WithoutNativeTypes(nativeTypes)
-                    .WithoutExternalRestrictions()
                     .ToHashSet();
-                    
-            return ExportTypes.Select(x => $"{ConsulFeatureSettings.TagDtoPrefix}{x.Name}").ToArray(); 
         }
 
         /// <summary>
@@ -39,8 +35,7 @@ namespace ServiceStack.Discovery.Consul
             // handles all tag matching, healthy and lowest round trip time (rtt)
             // throws GatewayServiceDiscoveryException back to the Gateway 
             // to allow retry/exception handling at call site
-            // TODO optional extra: set polly exception retry policy
-            return ConsulClient.GetService(dtoType.Name)?.Address;
+            return Discovery.GetService(Discovery.Registration.Name, dtoType.Name)?.Address;
         }
 
         /// <summary>

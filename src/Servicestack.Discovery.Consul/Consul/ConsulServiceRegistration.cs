@@ -8,13 +8,14 @@ namespace ServiceStack.Discovery.Consul
     [Route("/v1/agent/service/register", "PUT")]
     public class ConsulServiceRegistration : IUrlFilter
     {
-        public ConsulServiceRegistration(string name, string version)
+        public ConsulServiceRegistration(string id, string name)
         {
-            ID = name + version;
+            // ID must be unique, otherwise service registraions are overwritten
+            ID = id;
             Name = name;
         }
 
-        public string ID { get; set; }
+        public string ID { get; private set; }
 
         public string Name { get; private set; }
 

@@ -8,14 +8,16 @@ namespace ServiceStack.Discovery.Consul
     /// </summary>
     public class ConsulServiceResponse
     {
-        public string ID { get; set; }
+        public string Node { get; set; }
 
-        public string Service { get; set; }
+        public string ServiceID { get; set; }
 
-        public string[] Tags { get; set; }
+        public string ServiceName { get; set; }
 
-        public string Address { get; set; }
+        public string[] ServiceTags { get; set; }
 
-        public int Port { get; set; } = 0;
+        public string ServiceAddress { get; set; }
+
+        public int ServicePort { get; set; } = 0;
     }
 }

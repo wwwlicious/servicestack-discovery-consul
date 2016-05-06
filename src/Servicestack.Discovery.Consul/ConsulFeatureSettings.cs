@@ -14,7 +14,7 @@ namespace ServiceStack.Discovery.Consul
         /// <summary>
         /// Prefix used when registering and looking up requestDTO's
         /// </summary>
-        public const string TagDtoPrefix = "req-";
+        public const string GlobalServiceName = "servicestack";
 
         private readonly List<string> customTags = new List<string>();
 
@@ -37,12 +37,7 @@ namespace ServiceStack.Discovery.Consul
         /// <param name="tags"></param>
         public void AddTags(params string[] tags)
         {
-            // prefix is used to prevent and check for request name collisions between services
             var t = tags.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
-
-            if(t.Any(x => x.StartsWith(TagDtoPrefix)))
-                throw new InvalidTagException($"custom tags cannot use the reserved prefix '{TagDtoPrefix}'");
-
             customTags.AddRange(t);
         }
 

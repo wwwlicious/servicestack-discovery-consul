@@ -72,29 +72,39 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Checks\HealthCheck.cs" />
-    <Compile Include="Checks\Heartbeat.cs" />
-    <Compile Include="Checks\HealthCheckService.cs" />
-    <Compile Include="Checks\ServiceHealth.cs" />
-    <Compile Include="Consul.cs" />
+    <Compile Include="Discovery\ConsulService.cs" />
+    <Compile Include="Discovery\ConsulServiceId.cs" />
+    <Compile Include="Discovery\TagExtensions.cs" />
+    <Compile Include="Dtos\HealthCheck.cs" />
+    <Compile Include="Dtos\Heartbeat.cs" />
+    <Compile Include="Services\HealthCheckService.cs" />
+    <Compile Include="Dtos\ServiceHealth.cs" />
+    <Compile Include="Discovery\Consul.cs" />
+    <Compile Include="Discovery\ConsulDiscovery.cs" />
     <Compile Include="ConsulFeature.cs" />
     <Compile Include="ConsulFeatureSettings.cs" />
-    <Compile Include="ConsulServiceGatewayFactory.cs" />
-    <Compile Include="Consul\ConsulCatalogServiceResponse.cs" />
+    <Compile Include="Gateway\ConsulServiceGatewayFactory.cs" />
     <Compile Include="Consul\ConsulRegisterCheck.cs" />
-    <Compile Include="Consul\ConsulRegisterCheckValidator.cs" />
-    <Compile Include="Consul\ConsulRegisterServiceValidator.cs" />
+    <Compile Include="Dtos\GetServiceResponse.cs" />
+    <Compile Include="Dtos\GetServices.cs" />
+    <Compile Include="Dtos\GetServicesResponse.cs" />
+    <Compile Include="Validators\ConsulRegisterCheckValidator.cs" />
+    <Compile Include="Validators\ConsulRegisterServiceValidator.cs" />
     <Compile Include="Consul\ConsulServiceRegistration.cs" />
     <Compile Include="Consul\ConsulServiceResponse.cs" />
     <Compile Include="Consul\ConsulUris.cs" />
+    <Compile Include="Services\DiscoveryService.cs" />
     <Compile Include="Discovery\DefaultDiscoveryRequestTypeResolver.cs" />
-    <Compile Include="Discovery\GatewayServiceDiscoveryException.cs" />
+    <Compile Include="Exceptions\GatewayServiceDiscoveryException.cs" />
     <Compile Include="Discovery\IDiscoveryRequestTypeResolver.cs" />
-    <Compile Include="Discovery\TypeExtensions.cs" />
+    <Compile Include="TypeExtensions.cs" />
     <Compile Include="HostHealthCheck.cs" />
-    <Compile Include="InvalidTagException.cs" />
+    <Compile Include="Discovery\IDiscovery.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ConsulClient.cs" />
+    <Compile Include="Consul\ConsulClient.cs" />
+    <Compile Include="ServiceRegistration.cs" />
+    <Compile Include="Dtos\GetService.cs" />
+    <Compile Include="Validators\GetServiceValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

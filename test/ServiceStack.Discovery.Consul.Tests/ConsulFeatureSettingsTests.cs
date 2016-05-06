@@ -37,13 +37,6 @@ namespace ServiceStack.Discovery.Consul.Tests
         }
 
         [Fact]
-        public void AddingTagWithReservedPrefix_WillThrowException()
-        {
-            Action action = () => settings.AddTags($"{ConsulFeatureSettings.TagDtoPrefix}one");
-            action.ShouldThrow<InvalidTagException>().And.Message.Should().Be($"custom tags cannot use the reserved prefix '{ConsulFeatureSettings.TagDtoPrefix}'");
-        }
-
-        [Fact]
         public void NullOrEmptyTagsAreIgnored()
         {
             settings.AddTags(null, "", "    ", "me");
