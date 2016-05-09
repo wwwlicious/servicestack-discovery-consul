@@ -7,7 +7,7 @@ namespace ServiceStack.Discovery.Consul.Tests
     using System.Collections.Generic;
     using System.Linq;
 
-    public class TestDiscovery : IDiscoveryRequestTypeResolver
+    public class TestDiscovery : IDiscovery
     {
         public TestDiscovery(params KeyValuePair<Type, string>[] dtoTypes)
         {
@@ -16,10 +16,31 @@ namespace ServiceStack.Discovery.Consul.Tests
 
         public Dictionary<Type, string> DtoTypes { get; }
 
-        public string[] GetRequestTypes(IAppHost host)
+        public ServiceRegistration Registration { get; }
+
+        public void Register(IAppHost host)
         {
-            ExportTypes = DtoTypes.Keys.ToHashSet();
-            return ExportTypes.Select(x => x.Name).ToArray();
+            throw new NotImplementedException();
+        }
+
+        public void Unregister(IAppHost host)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ConsulService[] GetServices(string serviceName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ConsulService GetService(string serviceName, string dtoName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public HashSet<Type> GetRequestTypes(IAppHost host)
+        {
+            return DtoTypes.Keys.ToHashSet();
         }
 
         public string ResolveBaseUri(object dto)
@@ -31,7 +52,5 @@ namespace ServiceStack.Discovery.Consul.Tests
         {
             return DtoTypes.ContainsKey(dtoType) ? DtoTypes[dtoType] : null;
         }
-
-        public HashSet<Type> ExportTypes { get; private set; }
     }
 }

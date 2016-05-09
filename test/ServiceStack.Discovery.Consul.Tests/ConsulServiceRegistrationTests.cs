@@ -27,7 +27,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         [InlineData("  ")]
         public void Name_Is_Required(string name)
         {
-            validator.ShouldHaveValidationErrorFor(x => x.Name, new ConsulServiceRegistration(name, "1"));
+            validator.ShouldHaveValidationErrorFor(x => x.Name, new ConsulServiceRegistration("id", name));
         }
 
         [Theory]
@@ -37,25 +37,25 @@ namespace ServiceStack.Discovery.Consul.Tests
         {
             validator.ShouldHaveValidationErrorFor(
                 x => x.Port,
-                new ConsulServiceRegistration("name", "1") { Port = port });
+                new ConsulServiceRegistration("id", "name") { Port = port });
         }
 
         [Fact]
         public void RegisterService_Creates_Correct_Url()
         {
-            var url = new ConsulServiceRegistration("name", "1") { AclToken = "1234" }.ToPutUrl();
+            var url = new ConsulServiceRegistration("id", "name") { AclToken = "1234" }.ToPutUrl();
+
             url.Should().Be("/v1/agent/service/register?token=1234");
         }
 
         [Fact]
         public void RegisterService_IsSerialized_Correctly()
         {
-            var model = new ConsulServiceRegistration("name", "1")
+            var model = new ConsulServiceRegistration("override", "name")
                           {
                               Port = 1,
                               AclToken = "1234",
                               Address = "addr",
-                              ID = "override",
                               Tags = new[] { "a", "b" }
                           };
             model.ToJson().Should().Be("{\"ID\":\"override\",\"Name\":\"name\",\"Tags\":[\"a\",\"b\"],\"Address\":\"addr\",\"Port\":1}");
@@ -65,16 +65,14 @@ namespace ServiceStack.Discovery.Consul.Tests
         [Fact]
         public void DeSerialize_Consul_Service_Json()
         {
-            var result = "{\"ServiceAv2 - 0\":{\"ID\":\"ServiceAv2-0\",\"Service\":\"ServiceA\",\"Tags\":[\"v2-0\",\"EchoA\"],\"Address\":\"http://127.0.0.1:8091/\",\"Port\":1,\"EnableTagOverride\":false,\"CreateIndex\":0,\"ModifyIndex\":0}}";
-            var jsonObject = JsonObject.Parse(result);
-            var services = jsonObject.Values.Select(x => x.FromJson<ConsulServiceResponse>()).ToArray();
+            var result = "{\"Node\":\"X1-Win10\",\"Address\":\"127.0.0.1\",\"ServiceID\":\"ss-ServiceA-7f96fc1c-ab72-4471-bc90-a39cd5591545\",\"ServiceName\":\"api\",\"ServiceTags\":[\"ss-version-2.0\",\"EchoA\",\"one\",\"two\",\"three\"],\"ServiceAddress\":\"http://127.0.0.1:8091/\",\"ServicePort\":8091,\"ServiceEnableTagOverride\":false,\"CreateIndex\":7,\"ModifyIndex\":7}";
+            var service = result.FromJson<ConsulServiceResponse>();
 
-            services.Should().HaveCount(1);
-            services.First().ID.Should().Be("ServiceAv2-0");
-            services.First().Tags.Should().BeEquivalentTo("v2-0", "EchoA");
-            services.First().Address.Should().Be("http://127.0.0.1:8091/");
-            services.First().Service.Should().Be("ServiceA");
-            services.First().Port.Should().Be(1);
+            service.ServiceID.Should().Be("ss-ServiceA-7f96fc1c-ab72-4471-bc90-a39cd5591545");
+            service.ServiceTags.Should().BeEquivalentTo("ss-version-2.0", "EchoA", "one", "two", "three");
+            service.ServiceAddress.Should().Be("http://127.0.0.1:8091/");
+            service.ServiceName.Should().Be("api");
+            service.ServicePort.Should().Be(8091);
         }
     }
 }
