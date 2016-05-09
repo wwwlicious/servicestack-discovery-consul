@@ -38,11 +38,11 @@ namespace ServiceStack.Discovery.Consul.Tests
         }
 
         [Fact]
-        public void DiscoveryTypeResolver_Should_NotBeNull()
+        public void DiscoveryClient_Should_BeNull()
         {
             var plugin = new ConsulFeature();
 
-            plugin.Settings.GetDiscoveryTypeResolver().Should().NotBeNull();
+            plugin.Settings.GetDiscoveryClient().Should().BeNull();
         }
     }
 }

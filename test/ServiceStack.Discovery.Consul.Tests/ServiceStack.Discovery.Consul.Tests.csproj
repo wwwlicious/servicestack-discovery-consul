@@ -34,33 +34,40 @@
       <HintPath>..\..\src\packages\FakeItEasy.1.25.3\lib\net40\FakeItEasy.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="FluentAssertions, Version=4.3.2.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
-      <HintPath>..\..\src\packages\FluentAssertions.4.3.2\lib\net45\FluentAssertions.dll</HintPath>
+    <Reference Include="FluentAssertions, Version=4.4.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
+      <HintPath>..\..\src\packages\FluentAssertions.4.4.0\lib\net45\FluentAssertions.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="FluentAssertions.Core, Version=4.3.2.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
-      <HintPath>..\..\src\packages\FluentAssertions.4.3.2\lib\net45\FluentAssertions.Core.dll</HintPath>
+    <Reference Include="FluentAssertions.Core, Version=4.4.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
+      <HintPath>..\..\src\packages\FluentAssertions.4.4.0\lib\net45\FluentAssertions.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ServiceStack, Version=4.0.55.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\src\packages\ServiceStack.4.0.55\lib\net40\ServiceStack.dll</HintPath>
+    <Reference Include="ServiceStack">
+      <HintPath>..\..\src\packages\ServiceStack.4.0.57\lib\net40\ServiceStack.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Client">
+      <HintPath>..\..\src\packages\ServiceStack.Client.4.0.57\lib\net40\ServiceStack.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Common">
+      <HintPath>..\..\src\packages\ServiceStack.Common.4.0.57\lib\net40\ServiceStack.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Interfaces">
+      <HintPath>..\..\src\packages\ServiceStack.Interfaces.4.0.57\lib\portable-wp80+sl5+net40+win8+wpa81+monotouch+monoandroid+xamarin.ios10\ServiceStack.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite, Version=4.0.57.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\src\packages\ServiceStack.OrmLite.4.0.57\lib\net45\ServiceStack.OrmLite.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ServiceStack.Client, Version=4.0.55.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\src\packages\ServiceStack.Client.4.0.55\lib\net40\ServiceStack.Client.dll</HintPath>
+    <Reference Include="ServiceStack.Redis, Version=4.0.57.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\src\packages\ServiceStack.Redis.4.0.57\lib\net40\ServiceStack.Redis.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ServiceStack.Common, Version=4.0.55.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\src\packages\ServiceStack.Common.4.0.55\lib\net40\ServiceStack.Common.dll</HintPath>
+    <Reference Include="ServiceStack.Server, Version=4.0.57.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\src\packages\ServiceStack.Server.4.0.57\lib\net45\ServiceStack.Server.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ServiceStack.Interfaces, Version=4.0.0.0, Culture=neutral, PublicKeyToken=e06fbc6124f57c43, processorArchitecture=MSIL">
-      <HintPath>..\..\src\packages\ServiceStack.Interfaces.4.0.55\lib\portable-wp80+sl5+net40+win8+wpa81+monotouch+monoandroid+xamarin.ios10\ServiceStack.Interfaces.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ServiceStack.Text, Version=4.0.55.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\src\packages\ServiceStack.Text.4.0.55\lib\net40\ServiceStack.Text.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="ServiceStack.Text">
+      <HintPath>..\..\src\packages\ServiceStack.Text.4.0.57\lib\net40\ServiceStack.Text.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -99,6 +106,7 @@
     <Compile Include="Helpers\TestDiscovery.cs" />
     <Compile Include="HostHealthCheckTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TagExtensionsTests.cs" />
     <Compile Include="TypeExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>

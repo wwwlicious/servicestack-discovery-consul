@@ -14,6 +14,8 @@ namespace ServiceStack.Discovery.Consul
     /// </summary>
     public class ConsulFeature : IPlugin
     {
+        private IDiscovery Discovery { get; set; }
+
         public ConsulFeatureSettings Settings { get; }
 
         /// <summary>
@@ -25,8 +27,6 @@ namespace ServiceStack.Discovery.Consul
             settings?.Invoke(Settings);
         }
         
-        private ConsulServiceRegistration Registration { get; set; }
-
         public void Register(IAppHost appHost)
         {
             // HACK: not great but unsure how to improve
@@ -38,23 +38,28 @@ namespace ServiceStack.Discovery.Consul
             appHost.AfterInitCallbacks.Add(RegisterService);
             appHost.OnDisposeCallbacks.Add(UnRegisterService);
 
+            appHost.RegisterService<HealthCheckService>();
+            appHost.RegisterService<DiscoveryService>();
+
             // register plugin link
             appHost.GetPlugin<MetadataFeature>()?.AddPluginLink(ConsulUris.LocalAgent.CombineWith("ui"), "Consul Agent WebUI");
         }
 
         private void RegisterService(IAppHost host)
         {
-            ConsulClient.DiscoveryRequestResolver = Settings.GetDiscoveryTypeResolver();
-            Registration = ConsulClient.RegisterService(host, Settings.GetServiceChecks(), Settings.GetHealthCheck(), Settings.GetCustomTags(), Settings.IncludeDefaultServiceHealth);
+            Discovery = Settings.GetDiscoveryClient() ?? new ConsulDiscovery();
+            Discovery.Register(host);
 
+            // register servicestack discovery services
+            host.Register(Discovery);
             host.GetContainer()
-                .Register<IServiceGatewayFactory>(x => new ConsulServiceGatewayFactory(Settings.GetGateway(), Settings.GetDiscoveryTypeResolver()))
+                .Register<IServiceGatewayFactory>(x => new ConsulServiceGatewayFactory(Settings.GetGateway(), Discovery))
                 .ReusedWithin(ReuseScope.None);
         }
 
         private void UnRegisterService(IAppHost host = null)
         {
-            ConsulClient.DeregisterService(Registration);
+            Discovery.Unregister(host);
         }
     }
 

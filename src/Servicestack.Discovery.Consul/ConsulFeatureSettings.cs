@@ -14,13 +14,13 @@ namespace ServiceStack.Discovery.Consul
         /// <summary>
         /// Prefix used when registering and looking up requestDTO's
         /// </summary>
-        public const string TagDtoPrefix = "req-";
+        public const string GlobalServiceName = "servicestack";
 
         private readonly List<string> customTags = new List<string>();
 
         private readonly List<ConsulRegisterCheck> serviceChecks = new List<ConsulRegisterCheck>();
 
-        private IDiscoveryRequestTypeResolver typeResolver = new DefaultDiscoveryRequestTypeResolver();
+        private IDiscovery discoveryClient;
 
         private HostHealthCheck healthCheck;
 
@@ -37,12 +37,7 @@ namespace ServiceStack.Discovery.Consul
         /// <param name="tags"></param>
         public void AddTags(params string[] tags)
         {
-            // prefix is used to prevent and check for request name collisions between services
             var t = tags.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
-
-            if(t.Any(x => x.StartsWith(TagDtoPrefix)))
-                throw new InvalidTagException($"custom tags cannot use the reserved prefix '{TagDtoPrefix}'");
-
             customTags.AddRange(t);
         }
 
@@ -72,12 +67,12 @@ namespace ServiceStack.Discovery.Consul
         }
 
         /// <summary>
-        /// Override the default discovery type resolver
+        /// Override the default discovery consul client
         /// </summary>
-        /// <param name="resolver">the type resolver</param>
-        public void AddDiscoveryTypeResolver(IDiscoveryRequestTypeResolver resolver)
+        /// <param name="discoveryClient">the IDiscovery client</param>
+        public void AddDiscoveryTypeResolver(IDiscovery discoveryClient)
         {
-            typeResolver = resolver;
+            this.discoveryClient = discoveryClient;
         }
 
         /// <summary>
@@ -129,9 +124,9 @@ namespace ServiceStack.Discovery.Consul
         /// Gets the type resolver used for service discovery
         /// </summary>
         /// <returns></returns>
-        public IDiscoveryRequestTypeResolver GetDiscoveryTypeResolver()
+        public IDiscovery GetDiscoveryClient()
         {
-            return typeResolver;
+            return discoveryClient;
         }
     }
 }

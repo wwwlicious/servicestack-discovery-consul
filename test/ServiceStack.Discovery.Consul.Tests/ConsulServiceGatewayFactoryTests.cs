@@ -24,7 +24,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         public void Ctor_Requires_DefaultDiscovery()
         {
             Action action = () => new ConsulServiceGatewayFactory(uri => new JsonServiceClient(uri), null);
-            action.ShouldThrow<ArgumentNullException>().And.ParamName.Should().Be("typeResolver");
+            action.ShouldThrow<ArgumentNullException>().And.ParamName.Should().Be("discoveryClient");
         }
 
         [Fact]
@@ -42,14 +42,13 @@ namespace ServiceStack.Discovery.Consul.Tests
         public void Gateway_ReturnsCorrectly_ForNonLocalTypes()
         {
             var resolver = new TestDiscovery(new KeyValuePair<Type, string>(typeof(ConsulServiceGatewayFactoryTests), "http://banana"));
-            var gateway = new ConsulServiceGatewayFactory(uri => new CsvServiceClient(uri) { UserName = "splits" }, resolver);
+            var gateway = new ConsulServiceGatewayFactory(uri => new CsvServiceClient(uri) { Version = 123 }, resolver);
             gateway.LocalTypes.Clear();
 
             var serviceGateway = gateway.GetGateway(typeof(ConsulServiceGatewayFactoryTests));
 
-            var client = serviceGateway.Should().BeOfType<CsvServiceClient>().Subject;
-            client.BaseUri.Should().Be("http://banana");
-            client.UserName.Should().Be("splits");
+            var client = serviceGateway.Should().BeOfType<CachedServiceClient>().Subject;
+            client.Version.Should().Be(123);
         }
     }
 }
