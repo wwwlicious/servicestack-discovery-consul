@@ -44,6 +44,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         public void RegisterService_Creates_Correct_Url()
         {
             var url = new ConsulServiceRegistration("id", "name") { AclToken = "1234" }.ToPutUrl();
+
             url.Should().Be("/v1/agent/service/register?token=1234");
         }
 
