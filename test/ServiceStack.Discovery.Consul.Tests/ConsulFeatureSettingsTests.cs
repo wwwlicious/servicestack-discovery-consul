@@ -21,7 +21,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         public void VerifyDefaults()
         {
             settings.IncludeDefaultServiceHealth.Should().BeTrue();
-            settings.GetDiscoveryTypeResolver().Should().BeOfType<DefaultDiscoveryRequestTypeResolver>();
+            settings.GetDiscoveryClient().Should().BeNull();
             settings.GetHealthCheck().Should().BeNull();
             settings.GetServiceChecks().Should().BeEmpty();
             settings.GetCustomTags().Should().BeEmpty();
@@ -50,6 +50,15 @@ namespace ServiceStack.Discovery.Consul.Tests
             settings.IncludeDefaultServiceHealth = false;
 
             settings.IncludeDefaultServiceHealth.Should().BeFalse();
+        }
+
+        [Fact]
+        public void CanOverrideDiscoveryClient()
+        {
+            var client = new TestDiscovery();
+            settings.AddDiscoveryTypeResolver(client);
+
+            settings.GetDiscoveryClient().Should().Be(client);
         }
 
         [Fact]

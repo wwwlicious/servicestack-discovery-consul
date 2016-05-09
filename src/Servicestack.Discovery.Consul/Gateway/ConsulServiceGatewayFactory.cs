@@ -11,19 +11,19 @@ namespace ServiceStack.Discovery.Consul
     {
         private readonly DefaultGatewayDelegate defaultGateway;
 
-        private readonly IDiscoveryRequestTypeResolver typeResolver;
+        private readonly IDiscovery discoveryClient;
 
         private readonly ConcurrentDictionary<string, HttpCacheEntry> sharedCache = new ConcurrentDictionary<string, HttpCacheEntry>();
 
         public HashSet<Type> LocalTypes { get; set; }
 
-        public ConsulServiceGatewayFactory(DefaultGatewayDelegate defaultGateway, IDiscoveryRequestTypeResolver typeResolver)
+        public ConsulServiceGatewayFactory(DefaultGatewayDelegate defaultGateway, IDiscovery discoveryClient)
         {
             defaultGateway.ThrowIfNull(nameof(defaultGateway));
-            typeResolver.ThrowIfNull(nameof(typeResolver));
+            discoveryClient.ThrowIfNull(nameof(discoveryClient));
 
             this.defaultGateway = defaultGateway;
-            this.typeResolver = typeResolver;
+            this.discoveryClient = discoveryClient;
             this.LocalTypes = HostContext.Metadata?.RequestTypes ?? new HashSet<Type>();
         }
 
@@ -32,7 +32,7 @@ namespace ServiceStack.Discovery.Consul
             if (LocalTypes.Contains(requestType))
                 return localGateway;
 
-            var baseUri = typeResolver.ResolveBaseUri(requestType);
+            var baseUri = discoveryClient.ResolveBaseUri(requestType);
             if (string.IsNullOrWhiteSpace(baseUri))
             {
                 throw new WebServiceException($"Could not resolve the uri in consul for external requestType {requestType.Name}");

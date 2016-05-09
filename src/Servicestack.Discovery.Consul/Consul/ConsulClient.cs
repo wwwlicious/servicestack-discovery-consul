@@ -96,10 +96,6 @@ namespace ServiceStack.Discovery.Consul
                         $"Expected json but received empty or null reponse from {ConsulUris.GetServices(serviceName)}");
 
                 return response.FromJson<ConsulServiceResponse[]>();
-
-                //return JsonObject.Parse(servicesJson)
-                //    .Select(x => new ConsulServiceResponse { ID = x.Key, Tags = x.Value.FromJson<string[]>()})
-                //    .ToArray();
             }
             catch (Exception e)
             {
@@ -118,8 +114,9 @@ namespace ServiceStack.Discovery.Consul
         /// <exception cref="GatewayServiceDiscoveryException">throws exception if no service available for dto</exception>
         public static ConsulServiceResponse GetService(string serviceName, string tagName)
         {
-            // `passing` filters out any services with critical or warning health states
             // todo add flag to allow warning services to be included in results
+
+            // `passing` filters out any services with critical or warning health states
             // `near=_agent` sorts results by shortest round trip time
             var healthUri = ConsulUris.LocalAgent.CombineWith(ConsulUris.GetService(serviceName, tagName));
             try

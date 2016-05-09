@@ -14,18 +14,6 @@ namespace ServiceStack.Discovery.Consul
     /// </summary>
     public class ConsulDiscovery : IDiscovery
     {
-        private readonly IAppHost host;
-        private readonly ConsulFeatureSettings settings;
-
-        public ConsulDiscovery(IAppHost host, ConsulFeatureSettings settings)
-        {
-            host.ThrowIfNull(nameof(host));
-            settings.ThrowIfNull(nameof(settings));
-
-            this.host = host;
-            this.settings = settings;
-        }
-
         /// <summary>
         /// Contains the service registration information
         /// </summary>
@@ -34,12 +22,13 @@ namespace ServiceStack.Discovery.Consul
         /// <summary>
         /// Registers the apphost with consul
         /// </summary>
-        public void Register()
+        /// <param name="appHost"></param>
+        public void Register(IAppHost appHost)
         {
             // get endpoint http://url:port/path and version
-            var baseUrl = host.Config.WebHostUrl.CombineWith(host.Config.HandlerFactoryPath);
-            var dtoTypes = settings.GetDiscoveryTypeResolver().GetRequestTypes(host);
-            var customTags = settings.GetCustomTags();
+            var baseUrl = appHost.Config.WebHostUrl.CombineWith(appHost.Config.HandlerFactoryPath);
+            var dtoTypes = GetRequestTypes(appHost);
+            var customTags = appHost.GetPlugin<ConsulFeature>().Settings.GetCustomTags();
 
             // construct registration 
             var registration = new ServiceRegistration
@@ -76,16 +65,11 @@ namespace ServiceStack.Discovery.Consul
             Registration = registration;
         }
 
-        private int? GetPort(string baseUrl)
-        {
-            var uri = new Uri(baseUrl, UriKind.Absolute);
-            return uri.Port;
-        }
-
         /// <summary>
         /// Unregistered the apphost with consul
         /// </summary>
-        public void Unregister()
+        /// <param name="appHost"></param>
+        public void Unregister(IAppHost appHost)
         {
             if (Registration == null) return;
 
@@ -105,12 +89,40 @@ namespace ServiceStack.Discovery.Consul
             return new ConsulService(response);
         }
 
+        public HashSet<Type> GetRequestTypes(IAppHost host)
+        {
+            // registered the requestDTO type names for the lookup
+            // ignores types based on 
+            // https://github.com/ServiceStack/ServiceStack/wiki/Add-ServiceStack-Reference#excluding-types-from-add-servicestack-reference
+            var nativeTypes = host.GetPlugin<NativeTypesFeature>();
+
+            return
+                host.Metadata.RequestTypes
+                    .WithServiceDiscoveryAllowed()
+                    .WithoutNativeTypes(nativeTypes)
+                    .ToHashSet();
+        }
+
+        public string ResolveBaseUri(object dto)
+        {
+            return ResolveBaseUri(dto.GetType());
+        }
+
+        public string ResolveBaseUri(Type dtoType)
+        {
+            // handles all tag matching, healthy and lowest round trip time (rtt)
+            // throws GatewayServiceDiscoveryException back to the Gateway 
+            // to allow retry/exception handling at call site
+            return GetService(Registration.Name, dtoType.Name)?.Address;
+        }
+
         private ServiceHealthCheck[] CreateHealthChecks(ServiceRegistration registration)
         {
             var checks = new List<ServiceHealthCheck>();
             var serviceId = registration.Id;
             var baseUrl = registration.Address;
 
+            var settings = HostContext.GetPlugin<ConsulFeature>().Settings;
             if (settings.IncludeDefaultServiceHealth)
             {
                 var heartbeatCheck = CreateHeartbeatCheck(baseUrl, serviceId);
@@ -129,7 +141,12 @@ namespace ServiceStack.Discovery.Consul
 
             return checks.ToArray();
         }
-        
+        private int? GetPort(string baseUrl)
+        {
+            var uri = new Uri(baseUrl, UriKind.Absolute);
+            return uri.Port;
+        }
+
         private decimal GetVersion()
         {
             // defaults to get the servicestack version number, throws if not numeric
@@ -138,6 +155,7 @@ namespace ServiceStack.Discovery.Consul
 
         private ServiceHealthCheck CreateCustomCheck(string baseUrl, string serviceId)
         {
+            var settings = HostContext.GetPlugin<ConsulFeature>().Settings;
             if (settings.GetHealthCheck() == null)
             {
                 return null;
@@ -155,7 +173,7 @@ namespace ServiceStack.Discovery.Consul
 
         private ServiceHealthCheck CreateRedisCheck(string serviceId)
         {
-            var clientsManager = host.TryResolve<IRedisClientsManager>();
+            var clientsManager = HostContext.TryResolve<IRedisClientsManager>();
             if (clientsManager == null)
             {
                 return null;

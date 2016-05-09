@@ -31,6 +31,7 @@ namespace ServiceStack.Discovery.Consul
         /// </summary>
         public object Any(GetService request)
         {
+            // we can't rely on AppHost having validation plugin configured so just manually check
             GetServiceValidator.ValidateAndThrow(request);
             try
             {
@@ -39,6 +40,7 @@ namespace ServiceStack.Discovery.Consul
             }
             catch (WebServiceException e)
             {
+
                 throw;
             }
         }

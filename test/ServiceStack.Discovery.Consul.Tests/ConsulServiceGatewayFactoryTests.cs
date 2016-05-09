@@ -24,7 +24,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         public void Ctor_Requires_DefaultDiscovery()
         {
             Action action = () => new ConsulServiceGatewayFactory(uri => new JsonServiceClient(uri), null);
-            action.ShouldThrow<ArgumentNullException>().And.ParamName.Should().Be("typeResolver");
+            action.ShouldThrow<ArgumentNullException>().And.ParamName.Should().Be("discoveryClient");
         }
 
         [Fact]

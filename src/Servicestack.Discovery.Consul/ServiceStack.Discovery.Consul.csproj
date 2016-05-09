@@ -94,9 +94,7 @@
     <Compile Include="Consul\ConsulServiceResponse.cs" />
     <Compile Include="Consul\ConsulUris.cs" />
     <Compile Include="Services\DiscoveryService.cs" />
-    <Compile Include="Discovery\DefaultDiscoveryRequestTypeResolver.cs" />
     <Compile Include="Exceptions\GatewayServiceDiscoveryException.cs" />
-    <Compile Include="Discovery\IDiscoveryRequestTypeResolver.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="HostHealthCheck.cs" />
     <Compile Include="Discovery\IDiscovery.cs" />

@@ -7,7 +7,7 @@ namespace ServiceStack.Discovery.Consul
     {
         public static string ResolveTypedUrl(IServiceClientMeta client, string method, object dto)
         {
-            var resolver = HostContext.GetPlugin<ConsulFeature>().Settings.GetDiscoveryTypeResolver();
+            var resolver = HostContext.GetPlugin<ConsulFeature>().Settings.GetDiscoveryClient();
             var baseUri = resolver.ResolveBaseUri(dto);
             return (baseUri ?? client?.BaseUri)?.CombineWith(dto.ToUrl(method ?? "GET", client?.Format));
         }

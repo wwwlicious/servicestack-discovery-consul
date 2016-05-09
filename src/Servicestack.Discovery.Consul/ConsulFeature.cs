@@ -14,9 +14,7 @@ namespace ServiceStack.Discovery.Consul
     /// </summary>
     public class ConsulFeature : IPlugin
     {
-        private ConsulDiscovery Discovery { get; set; }
-
-        public ServiceRegistration Registration => Discovery.Registration;
+        private IDiscovery Discovery { get; set; }
 
         public ConsulFeatureSettings Settings { get; }
 
@@ -49,19 +47,19 @@ namespace ServiceStack.Discovery.Consul
 
         private void RegisterService(IAppHost host)
         {
-            Discovery = new ConsulDiscovery(host, Settings);
-            Discovery.Register();
+            Discovery = Settings.GetDiscoveryClient() ?? new ConsulDiscovery();
+            Discovery.Register(host);
 
             // register servicestack discovery services
-            host.GetContainer().Register<IDiscovery>(Discovery);
+            host.Register(Discovery);
             host.GetContainer()
-                .Register<IServiceGatewayFactory>(x => new ConsulServiceGatewayFactory(Settings.GetGateway(), Settings.GetDiscoveryTypeResolver()))
+                .Register<IServiceGatewayFactory>(x => new ConsulServiceGatewayFactory(Settings.GetGateway(), Discovery))
                 .ReusedWithin(ReuseScope.None);
         }
 
         private void UnRegisterService(IAppHost host = null)
         {
-            Discovery.Unregister();
+            Discovery.Unregister(host);
         }
     }
 

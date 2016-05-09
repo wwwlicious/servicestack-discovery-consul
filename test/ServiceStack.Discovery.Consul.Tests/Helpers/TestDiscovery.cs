@@ -7,7 +7,7 @@ namespace ServiceStack.Discovery.Consul.Tests
     using System.Collections.Generic;
     using System.Linq;
 
-    public class TestDiscovery : IDiscoveryRequestTypeResolver
+    public class TestDiscovery : IDiscovery
     {
         public TestDiscovery(params KeyValuePair<Type, string>[] dtoTypes)
         {
@@ -15,6 +15,28 @@ namespace ServiceStack.Discovery.Consul.Tests
         }
 
         public Dictionary<Type, string> DtoTypes { get; }
+
+        public ServiceRegistration Registration { get; }
+
+        public void Register(IAppHost host)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Unregister(IAppHost host)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ConsulService[] GetServices(string serviceName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ConsulService GetService(string serviceName, string dtoName)
+        {
+            throw new NotImplementedException();
+        }
 
         public HashSet<Type> GetRequestTypes(IAppHost host)
         {
