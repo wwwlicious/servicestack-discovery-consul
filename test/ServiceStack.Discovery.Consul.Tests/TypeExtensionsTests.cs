@@ -35,13 +35,7 @@ namespace ServiceStack.Discovery.Consul.Tests
             result.Should().BeEquivalentTo(Types);
         }
 
-        [Fact]
-        public void WithoutExternalRestrictions_FiltersExpectedTypes()
-        {
-            var result = Types.WithoutExternalRestrictions();
-
-            result.Should().HaveCount(1).And.OnlyContain(x => x == typeof(Test3));
-        }
+        
 
         [Exclude(Feature.Metadata)]
         [Restrict(RequestAttributes.InternalNetworkAccess)]

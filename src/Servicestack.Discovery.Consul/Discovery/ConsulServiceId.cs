@@ -3,13 +3,9 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/. 
 namespace ServiceStack.Discovery.Consul
 {
-    /// <summary>
-    /// Represents a consul registered service and it's tags 
-    /// </summary>
-    public class ConsulCatalogServiceResponse
+    public class ConsulServiceId
     {
-        public string ID { get; set; }
-
+        public string Id { get; set; }
         public string[] Tags { get; set; }
     }
 }

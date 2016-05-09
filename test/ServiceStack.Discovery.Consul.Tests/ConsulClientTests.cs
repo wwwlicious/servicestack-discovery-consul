@@ -4,10 +4,7 @@
 namespace ServiceStack.Discovery.Consul.Tests
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using FluentAssertions;
-    using ServiceStack.DataAnnotations;
     using Xunit;
 
     [Collection("AppHost")]
@@ -23,52 +20,31 @@ namespace ServiceStack.Discovery.Consul.Tests
         [Fact]
         public void GetServices_ParsesExpectedJsonCorrectly()
         {
-            using (new HttpResultsFilter(@"{""SS-S1"":[""req-one"", ""ServiceStack""],""SS-S2"":[""req-two"", ""ServiceStack""],}"))
+            using (new HttpResultsFilter("[{\"Node\":\"X1-Win10\",\"Address\":\"127.0.0.1\",\"ServiceID\":\"ss-ServiceA-7f96fc1c-ab72-4471-bc90-a39cd5591545\",\"ServiceName\":\"api\",\"ServiceTags\":[\"ss-version-2.0\",\"EchoA\",\"one\",\"two\",\"three\"],\"ServiceAddress\":\"http://127.0.0.1:8091/\",\"ServicePort\":8091,\"ServiceEnableTagOverride\":false,\"CreateIndex\":7,\"ModifyIndex\":7},{\"Node\":\"X1-Win10\",\"Address\":\"127.0.0.1\",\"ServiceID\":\"ss-ServiceB-73dff66c-bc91-43f3-92f5-6ee7677b2756\",\"ServiceName\":\"api\",\"ServiceTags\":[\"ss-version-1.0\",\"EchoB\"],\"ServiceAddress\":\"http://localhost:8092/api/\",\"ServicePort\":8092,\"ServiceEnableTagOverride\":false,\"CreateIndex\":6,\"ModifyIndex\":6}]"))
             {
-                var services = ConsulClient.GetServices();
+                var services = ConsulClient.GetServices("ServiceStack");
 
                 services.Should()
                     .HaveCount(2)
-                    .And.ContainSingle(x => x.ID == "SS-S1")
-                    .And.ContainSingle(x => x.ID == "SS-S2");
+                    .And.ContainSingle(x => x.ServiceID == "ss-ServiceA-7f96fc1c-ab72-4471-bc90-a39cd5591545")
+                    .And.ContainSingle(x => x.ServiceID == "ss-ServiceB-73dff66c-bc91-43f3-92f5-6ee7677b2756");
             }
         }
-
-        [Fact]
-        public void CanFilterServicesByTag()
-        {
-            using (new HttpResultsFilter(@"{""SS-S1"":[""req-one"", ""ServiceStack""],""SS-S2"":[""req-two"", ""ServiceStack""],}"))
-            {
-                var services = ConsulClient.FindService("two");
-                services.Should().HaveCount(1).And.ContainSingle(x => x.ID == "SS-S2");
-            }
-        }
-
-        [Fact]
-        public void FindService_ReturnsEmpty_WhenNoIsTagMatch()
-        {
-            using (new HttpResultsFilter(@"{""SS-S1"":[""req-one"", ""ServiceStack""],""SS-S2"":[""req-two"", ""ServiceStack""],}"))
-            {
-                var services = ConsulClient.FindService("three");
-
-                services.Should().BeEmpty();
-            }
-        }
-
+        
         [Theory]
         [InlineData(null)]
         [InlineData("")]
         [InlineData("   ")]
-        public void FindService_ThrowsException_WhenResponseIsEmpty(string response)
+        public void GetService_ThrowsException_WhenResponseIsEmpty(string response)
         {
             using (new HttpResultsFilter(response))
             {
-                Action action = () => ConsulClient.FindService("three");
+                Action action = () => ConsulClient.GetService("service", "three");
 
-                var ex = action.ShouldThrow<GatewayServiceDiscoveryException>();
-                ex.WithMessage("Unable to retrieve services from Consul");
-                ex.WithInnerException<WebServiceException>()
-                    .WithInnerMessage("Expected json but received empty or null reponse from http://127.0.0.1:8500/v1/catalog/services?near=_agent");
+                action.ShouldThrow<GatewayServiceDiscoveryException>()
+                    .WithMessage("No healthy services are currently registered to process the request of type 'three'")
+                    .WithInnerException<WebServiceException>()
+                    .WithInnerMessage("Expected json but received empty or null reponse from http://127.0.0.1:8500/v1/catalog/service/service?near=_agent&passing&tag=three");
             }
         }
 
@@ -77,7 +53,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         {
             using (new HttpResultsFilter { StringResultFn = (request, s) => { throw new Exception("unexpected"); }})
             {
-                Action action = () => ConsulClient.GetServices();
+                Action action = () => ConsulClient.GetServices("servicestack");
 
                 var ex = action.ShouldThrow<GatewayServiceDiscoveryException>();
                 ex.WithMessage("Unable to retrieve services from Consul");
@@ -88,37 +64,11 @@ namespace ServiceStack.Discovery.Consul.Tests
         [Fact]
         public void GetService_WithNoMatchingTag_ThrowException()
         {
-            using (new HttpResultsFilter(@"{""SS-S1"":[""req-one"", ""ServiceStack""],""SS-S2"":[""req-two"", ""ServiceStack""],}"))
+            using (new HttpResultsFilter("[]"))
             {
-                Action action = () => ConsulClient.GetService("three");
+                Action action = () => ConsulClient.GetService("ServiceStack", "three");
 
-                action.ShouldThrow<GatewayServiceDiscoveryException>().WithMessage("No services are currently registered to process the request of type 'three'");
-            }
-        }
-
-        [Theory]
-        [InlineData(null)]
-        [InlineData("")]
-        [InlineData("  ")]
-        public void GetService_ThrowsException_WhenServiceRequestResponseIsEmpty(string response)
-        {
-            using (new HttpResultsFilter
-            {
-                StringResultFn = (request, s) =>
-                {
-                    if (request.RequestUri.AbsoluteUri == "http://127.0.0.1:8500/v1/catalog/services?near=_agent")
-                    {
-                        return @"{""SS-S1"":[""req-one"", ""ServiceStack""],""SS-S2"":[""req-two"", ""ServiceStack""],}";
-                    }
-                    return response;
-                }
-            })
-            {
-                Action action = () => ConsulClient.GetService("one");
-                action.ShouldThrow<GatewayServiceDiscoveryException>()
-                    .WithMessage("No healthy services are currently registered to process the request of type 'one'")
-                    .WithInnerException<WebServiceException>()
-                    .WithInnerMessage("Expected json but received empty or null reponse from http://127.0.0.1:8500/v1/health/service/SS-S1?near=_agent&passing&tag=req-one");
+                action.ShouldThrow<GatewayServiceDiscoveryException>().WithMessage("No healthy services are currently registered to process the request of type 'three'");
             }
         }
 
@@ -129,26 +79,21 @@ namespace ServiceStack.Discovery.Consul.Tests
             {
                 StringResultFn = (request, s) =>
                 {
-                    if (request.RequestUri.AbsoluteUri == "http://127.0.0.1:8500/v1/catalog/services?near=_agent")
+                    if (request.RequestUri.AbsoluteUri == "http://127.0.0.1:8500/v1/catalog/service/api?near=_agent&passing&tag=EchoA")
                     {
-                        return @"{""SS-S1"":[""req-EchoA"", ""ServiceStack""],""SS-S2"":[""req-two"", ""ServiceStack""],}";
-                    }
-                    if (request.RequestUri.AbsoluteUri == "http://127.0.0.1:8500/v1/health/service/SS-S1?near=_agent&passing&tag=req-EchoA")
-                    {
-                        return
-                            @"[{""Node"":{""Node"":""X1-Win10"",""Address"":""127.0.0.1"",""TaggedAddresses"":{""wan"":""127.0.0.1""},""CreateIndex"":3,""ModifyIndex"":1612},""Service"":{""ID"":""SS-ServiceAv2-0"",""Service"":""SS-ServiceA"",""Tags"":[""v2-0"",""ServiceStack"",""req-EchoA"",""one"",""two"",""three""],""Address"":""http://127.0.0.1:8091/"",""Port"":0,""EnableTagOverride"":false,""CreateIndex"":1607,""ModifyIndex"":1612},""Checks"":[{""Node"":""X1-Win10"",""CheckID"":""serfHealth"",""Name"":""Serf Health Status"",""Status"":""passing"",""Notes"":"""",""Output"":""Agent alive and reachable"",""ServiceID"":"""",""ServiceName"":"""",""CreateIndex"":3,""ModifyIndex"":3},{""Node"":""X1-Win10"",""CheckID"":""SS-ServiceAv2-0:SS-HealthCheck"",""Name"":""SS-HealthCheck"",""Status"":""passing"",""Notes"":""This check is an HTTP GET request which expects the service to return 200 OK"",""Output"":"""",""ServiceID"":""SS-ServiceAv2-0"",""ServiceName"":""SS-ServiceA"",""CreateIndex"":1609,""ModifyIndex"":1612},{""Node"":""X1-Win10"",""CheckID"":""SS-ServiceAv2-0:SS-HeartBeat"",""Name"":""SS-HeartBeat"",""Status"":""passing"",""Notes"":""A heartbeat service to check if the service is reachable, expects 200 response"",""Output"":"""",""ServiceID"":""SS-ServiceAv2-0"",""ServiceName"":""SS-ServiceA"",""CreateIndex"":1608,""ModifyIndex"":1611}]}]";
+                        return @"[{""Node"":""X1-Win10"",""Address"":""127.0.0.1"",""ServiceID"":""ss-ServiceA-7f96fc1c-ab72-4471-bc90-a39cd5591545"",""ServiceName"":""api"",""ServiceTags"":[""ss-version-2.0"",""EchoA"",""one"",""two"",""three""],""ServiceAddress"":""http://127.0.0.1:8091/"",""ServicePort"":8091,""ServiceEnableTagOverride"":false,""CreateIndex"":7,""ModifyIndex"":7},{""Node"":""X1-Win10"",""Address"":""127.0.0.1"",""ServiceID"":""ss-ServiceB-73dff66c-bc91-43f3-92f5-6ee7677b2756"",""ServiceName"":""api"",""ServiceTags"":[""ss-version-1.0"",""EchoB""],""ServiceAddress"":""http://localhost:8092/api/"",""ServicePort"":8092,""ServiceEnableTagOverride"":false,""CreateIndex"":6,""ModifyIndex"":6}]";
                     }
                     return null;
                 }
             })
             {
-                var response = ConsulClient.GetService("EchoA");
+                var response = ConsulClient.GetService("api", "EchoA");
 
-                response.Service.Should().Be("SS-ServiceA");
-                response.ID.Should().Be("SS-ServiceAv2-0");
-                response.Address.Should().Be("http://127.0.0.1:8091/");
-                response.Port.Should().Be(0);
-                response.Tags.Should().BeEquivalentTo("v2-0", "ServiceStack", "req-EchoA", "one", "two", "three");
+                response.ServiceName.Should().Be("api");
+                response.ServiceID.Should().Be("ss-ServiceA-7f96fc1c-ab72-4471-bc90-a39cd5591545");
+                response.ServiceAddress.Should().Be("http://127.0.0.1:8091/");
+                response.ServicePort.Should().Be(8091);
+                response.ServiceTags.Should().BeEquivalentTo("ss-version-2.0", "EchoA", "one", "two", "three");
             }
         }
     }

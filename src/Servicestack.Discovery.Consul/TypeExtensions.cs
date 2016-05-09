@@ -39,14 +39,11 @@ namespace ServiceStack.Discovery.Consul
                     .Where(x => !nativeTypes.MetadataTypesConfig.IgnoreTypesInNamespaces.Contains(x.Namespace));
         }
 
-        /// <summary>
-        /// Filters out types without the <see cref="RestrictAttribute.ExternalOnly"/> flag
-        /// </summary>
-        /// <param name="types"></param>
-        /// <returns></returns>
-        public static IEnumerable<Type> WithoutExternalRestrictions(this IEnumerable<Type> types)
-        {
-            return types.Where(x => x.AllAttributes<RestrictAttribute>().All(a => a.CanShowTo(RequestAttributes.External)));
-        }
+        public static bool HasXmlClientSupport(this Type type) => !type.AllAttributes<ExcludeAttribute>().Any(t => t.Feature.HasFlag(Feature.Xml)) &&
+                                                                  type.AllAttributes<RestrictAttribute>().All(t => t.HasAccessTo(RequestAttributes.Xml));
+        public static bool HasJsvClientSupport(this Type type) => !type.AllAttributes<ExcludeAttribute>().Any(t => t.Feature.HasFlag(Feature.Jsv)) &&
+                                                                  type.AllAttributes<RestrictAttribute>().All(t => t.HasAccessTo(RequestAttributes.Jsv));
+        public static bool HasJsonClientSupport(this Type type) => !type.AllAttributes<ExcludeAttribute>().Any(t => t.Feature.HasFlag(Feature.Json)) &&
+                                                                  type.AllAttributes<RestrictAttribute>().All(t => t.HasAccessTo(RequestAttributes.Json));
     }
 }

@@ -15,12 +15,5 @@ namespace ServiceStack.Discovery.Consul.Tests
         {
             this.fixture = fixture;
         }
-
-        [Fact(Skip = "prob better as integration test")]
-        public void CanCorrectlyDiscoverDtoTypes()
-        {
-            var resolver = new DefaultDiscoveryRequestTypeResolver();
-            resolver.GetRequestTypes(fixture.Host);
-        }
     }
 }
