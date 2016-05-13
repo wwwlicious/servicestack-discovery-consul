@@ -5,13 +5,16 @@ namespace ServiceStack.Discovery.Consul
 {
     using System.Runtime.Serialization;
 
+    /// <summary>
+    /// Represents a consul health check
+    /// </summary>
     [Route("/v1/agent/check/register", "PUT")]
     public class ConsulRegisterCheck : IUrlFilter
     {
         /// <summary>
         /// Creates a new health check in consul
         /// </summary>
-        /// <param name="name">The name to use for the health check in consul - descriptive only</param>
+        /// <param name="name">The name to use for the health check in consul</param>
         /// <param name="serviceId">The Id of service to associate this health check with</param>
         public ConsulRegisterCheck(string name, string serviceId = null)
         {
@@ -48,12 +51,24 @@ namespace ServiceStack.Discovery.Consul
 
         public string DockerContainerID { get; set; }
 
+        /// <summary>
+        /// Reference a shell script relative to the consul agent path
+        /// </summary>
         public string Shell { get; set; }
 
+        /// <summary>
+        /// the GET HTTP URL consul will query
+        /// </summary>
         public string HTTP { get; set; }
 
+        /// <summary>
+        /// the TCP IP:PORT address consul will query
+        /// </summary>
         public string TCP { get; set; }
 
+        /// <summary>
+        /// the frequency with which consul will run the health check
+        /// </summary>
         [IgnoreDataMember]
         public double? IntervalInSeconds { get; set; }
 

@@ -4,67 +4,68 @@
 namespace ServiceStack.Discovery.Consul
 {
     using System;
-    using System.Collections.Generic;
+    using Funq;
 
     using ServiceStack;
+    using ServiceStack.Web;
 
     /// <summary>
-    /// Enabled service to service calls by dynamically looking up remote service url
+    /// Enables remote service calls by dynamically looking up remote service url
     /// </summary>
     public class ConsulFeature : IPlugin
     {
-        private readonly ServiceClientBase defaultServiceClient;
+        private IDiscovery Discovery { get; set; }
 
-        /// <summary>
-        /// Can be used to add tags such as environment to the service registration
-        /// </summary>
-        public List<string> CustomTags { get; } = new List<string>();
-
-        public List<ConsulRegisterCheck> ServiceChecks { get; } = new List<ConsulRegisterCheck>();
-
-        public IDiscoveryRequestTypeResolver DiscoveryTypeResolver { get; set; } = new DefaultDiscoveryRequestTypeResolver();
+        public ConsulFeatureSettings Settings { get; }
 
         /// <summary>
         /// Enables service discovery using consul to resolve the correct url for a remote RequestDTO
         /// </summary>
-        /// <param name="defaultServiceClient">If specified, will register a client with IoC for Autowiring</param>
-        public ConsulFeature(ServiceClientBase defaultServiceClient = null)
+        public ConsulFeature(ConsulSettings settings = null)
         {
-            this.defaultServiceClient = defaultServiceClient;
+            Settings = new ConsulFeatureSettings();
+            settings?.Invoke(Settings);
         }
-
-        public bool IncludeDefaultServiceHealth { get; set; } = true;
-
-        private ConsulServiceRegistration Registration { get; set; }
-
+        
         public void Register(IAppHost appHost)
         {
             // HACK: not great but unsure how to improve
             // throws exception if WebHostUrl isn't set as this is how we get endpoint url:port
             if (appHost.Config?.WebHostUrl == null)
-                throw new ApplicationException("appHost.Config.WebHostUrl must be set to use the Consul plugin so that the service can sent it's full http://url:port to Consul");
+                throw new ApplicationException("appHost.Config.WebHostUrl must be set to use the Consul plugin, this is so consul will know the full external http://url:port for the service");
 
+            // register callbacks
             appHost.AfterInitCallbacks.Add(RegisterService);
             appHost.OnDisposeCallbacks.Add(UnRegisterService);
-            ConsulClient.DiscoveryRequestResolver = DiscoveryTypeResolver;
 
-            // register with IoC if default client specified, otherwise will leave 
-            // implementor to manually register the TypedUrlResolverDelegate
-            if (defaultServiceClient != null)
-            {
-                defaultServiceClient.TypedUrlResolver = Consul.ResolveTypedUrl;
-                appHost.GetContainer().Register<IServiceClient>(defaultServiceClient);
-            }
+            appHost.RegisterService<HealthCheckService>();
+            appHost.RegisterService<DiscoveryService>();
+
+            // register plugin link
+            appHost.GetPlugin<MetadataFeature>()?.AddPluginLink(ConsulUris.LocalAgent.CombineWith("ui"), "Consul Agent WebUI");
         }
 
         private void RegisterService(IAppHost host)
         {
-            Registration = ConsulClient.RegisterService(host, ServiceChecks, CustomTags, IncludeDefaultServiceHealth);
+            Discovery = Settings.GetDiscoveryClient() ?? new ConsulDiscovery();
+            Discovery.Register(host);
+
+            // register servicestack discovery services
+            host.Register(Discovery);
+            host.GetContainer()
+                .Register<IServiceGatewayFactory>(x => new ConsulServiceGatewayFactory(Settings.GetGateway(), Discovery))
+                .ReusedWithin(ReuseScope.None);
         }
 
         private void UnRegisterService(IAppHost host = null)
         {
-            ConsulClient.DeregisterService(Registration);
+            Discovery.Unregister(host);
         }
     }
+
+    public delegate HealthCheck HealthCheckDelegate(IAppHost appHost);
+
+    public delegate IServiceGateway DefaultGatewayDelegate(string baseUri);
+
+    public delegate void ConsulSettings(ConsulFeatureSettings settings);
 }

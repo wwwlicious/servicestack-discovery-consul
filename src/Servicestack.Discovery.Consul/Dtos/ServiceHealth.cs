@@ -3,10 +3,10 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace ServiceStack.Discovery.Consul
 {
-    public interface IDiscoveryRequestTypeResolver
+    public enum ServiceHealth
     {
-        string[] GetRequestTypes(IAppHost host);
-
-        string ResolveBaseUri(object dto);
+        Ok,
+        Warning,
+        Critical
     }
 }

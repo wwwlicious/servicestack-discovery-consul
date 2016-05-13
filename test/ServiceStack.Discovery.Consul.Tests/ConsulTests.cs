@@ -3,25 +3,21 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/. 
 namespace ServiceStack.Discovery.Consul.Tests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     using FluentAssertions;
-
-    using ServiceStack.Testing;
-
     using Xunit;
 
-    [Collection("ConsulTests")]
+    [Collection("AppHost")]
     public class ConsulTests
     {
-        public ConsulTests()
+        private readonly AppHostFixture fixture;
+        private readonly IAppHost host;
+        private readonly ConsulFeature plugin;
+
+        public ConsulTests(AppHostFixture fixture)
         {
-            if (ServiceStackHost.Instance == null)
-            {
-                new BasicAppHost().Init();
-            }
+            this.fixture = fixture;
+            this.host = fixture.Host;
+            this.plugin = host.GetPlugin<ConsulFeature>();
         }
 
         [Fact]
@@ -31,8 +27,8 @@ namespace ServiceStack.Discovery.Consul.Tests
             var expected = remoteuri.CombineWith("/json/reply/ConsulTests.TestDTO");
 
             var discovery = new TestDiscovery();
-            discovery.TypeTypes.Add(typeof(TestDTO), remoteuri);
-            ConsulClient.DiscoveryRequestResolver = discovery;
+            discovery.DtoTypes.Add(typeof(TestDTO), remoteuri);
+            plugin.Settings.AddDiscoveryTypeResolver(discovery);
 
             Consul.ResolveTypedUrl(new JsonServiceClient("http://localhost/"), "GET", new TestDTO()).Should().Be(expected);
         }
@@ -42,7 +38,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         {
             var baseUri = "http://testuri/";
             var expected = baseUri.CombineWith("/json/reply/ConsulTests.TestDTO");
-            ConsulClient.DiscoveryRequestResolver = new TestDiscovery();
+            plugin.Settings.AddDiscoveryTypeResolver(new TestDiscovery());
 
             Consul.ResolveTypedUrl(new JsonServiceClient(baseUri), null, new TestDTO()).Should().Be(expected);
         }
@@ -50,7 +46,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         [Fact]
         public void Resolver_ReturnsNull_ForUnregisteredType()
         {
-            ConsulClient.DiscoveryRequestResolver = new TestDiscovery();
+            plugin.Settings.AddDiscoveryTypeResolver(new TestDiscovery());
 
             Consul.ResolveTypedUrl(null, null, new TestDTO()).Should().BeNull();
         }
@@ -65,8 +61,8 @@ namespace ServiceStack.Discovery.Consul.Tests
         {
             var discovery = new TestDiscovery();
             var remoteuri = "http://remoteUri:1234/";
-            discovery.TypeTypes.Add(typeof(TestDTO2), remoteuri);
-            ConsulClient.DiscoveryRequestResolver = discovery;
+            discovery.DtoTypes.Add(typeof(TestDTO2), remoteuri);
+            plugin.Settings.AddDiscoveryTypeResolver(discovery);
 
             Consul.ResolveTypedUrl(new JsonServiceClient("http://localhost"), method, new TestDTO2()).Should().Be(remoteuri.CombineWith(expected));
         }
@@ -79,21 +75,5 @@ namespace ServiceStack.Discovery.Consul.Tests
         [Route("/delete/dto2", "DELETE")]
         [Route("/patch/dto2", "PATCH")]
         private class TestDTO2 : IReturn<int> { }
-    }
-
-    public class TestDiscovery : IDiscoveryRequestTypeResolver
-    {
-        public string[] GetRequestTypes(IAppHost host)
-        {
-            return TypeTypes.Keys.Select(x => x.GetType().Name).ToArray();
-        }
-
-        public Dictionary<Type, string> TypeTypes { get; } = new Dictionary<Type, string>();
-
-        public string ResolveBaseUri(object dto)
-        {
-            var key = dto.GetType();
-            return TypeTypes.ContainsKey(key) ? TypeTypes[key] : null;
-        }
     }
 }

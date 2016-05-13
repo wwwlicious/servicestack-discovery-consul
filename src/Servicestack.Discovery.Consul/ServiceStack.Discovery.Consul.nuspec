@@ -9,12 +9,10 @@
     <licenseUrl>https://opensource.org/licenses/MPL-2.0</licenseUrl>
     <iconUrl>https://servicestack.net/img/logo-32.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <tags>servicestack plugin discovery servicediscovery microservices consul</tags>
+    <tags>servicestack plugin discovery gateway servicediscovery microservices consul</tags>
     <releaseNotes>See github project for details</releaseNotes>
     <dependencies>
-      <dependency id="ServiceStack" version="[4.0.54, 5)" />
-      <dependency id="ServiceStack.Common" version="[4.0.54, 5)" />
-      <dependency id="ServiceStack.Text" version="[4.0.54, 5)" />
+      <dependency id="ServiceStack.Server" version="[4.0.57, 5)" />
     </dependencies>
   </metadata>
 </package>

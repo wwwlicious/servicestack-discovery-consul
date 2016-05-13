@@ -5,21 +5,21 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1B7F3199-DD93-4058-841F-9C26AD11B185}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Discovery.Consul", "src\Servicestack.Discovery.Consul\ServiceStack.Discovery.Consul.csproj", "{A4E5E757-119D-4D86-BFFC-57A425F51A5C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Discovery.Consul", "Servicestack.Discovery.Consul\ServiceStack.Discovery.Consul.csproj", "{A4E5E757-119D-4D86-BFFC-57A425F51A5C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{DAA1C57E-3FE4-4AC0-9EC6-99725BCCC074}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Discovery.Consul.Tests", "test\ServiceStack.Discovery.Consul.Tests\ServiceStack.Discovery.Consul.Tests.csproj", "{77439803-16B6-4543-AF4D-9B54C69E7AF3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Discovery.Consul.Tests", "..\test\ServiceStack.Discovery.Consul.Tests\ServiceStack.Discovery.Consul.Tests.csproj", "{77439803-16B6-4543-AF4D-9B54C69E7AF3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".docs", ".docs", "{00F2FB49-D8AF-46A7-8EAD-704D6D7693FA}"
 	ProjectSection(SolutionItems) = preProject
-		LICENSE = LICENSE
-		README.md = README.md
+		..\LICENSE = ..\LICENSE
+		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestServiceA", "test\TestServiceA\TestServiceA.csproj", "{428A99A8-32C7-48A4-AC6B-9A19D4712F28}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestServiceA", "..\test\TestServiceA\TestServiceA.csproj", "{428A99A8-32C7-48A4-AC6B-9A19D4712F28}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestServiceB", "test\TestServiceB\TestServiceB.csproj", "{05DE4C72-C7A0-4BE4-B2D5-4E42625F572B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestServiceB", "..\test\TestServiceB\TestServiceB.csproj", "{05DE4C72-C7A0-4BE4-B2D5-4E42625F572B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "demo", "demo", "{94A68D7C-DAA7-4EBC-81F3-9D4FB6B91251}"
 EndProject

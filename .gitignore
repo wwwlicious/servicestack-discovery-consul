@@ -234,3 +234,5 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+/ServiceStack.Discovery.Consul.sln.dotSettings
+/test/ServiceStack.Discovery.Consul.Tests/ServiceStack.Discovery.Consul.Tests.csproj.DotSettings

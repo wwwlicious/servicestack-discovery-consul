@@ -5,11 +5,9 @@ namespace ServiceStack.Discovery.Consul
 {
     using ServiceStack.DataAnnotations;
 
-    [Exclude(Feature.Metadata)]
+    [Exclude(Feature.Metadata | Feature.ServiceDiscovery)]
     public class Heartbeat
     {
         public string Url { get; set; }
-
-        public int StatusCode { get; set; }
     }
 }

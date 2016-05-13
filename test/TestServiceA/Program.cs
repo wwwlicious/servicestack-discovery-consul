@@ -1,6 +1,7 @@
 ﻿// This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 namespace TestServiceA
 {
     using System;
@@ -41,30 +42,34 @@ namespace TestServiceA
                 ApiVersion = "2.0"
             });
 
-            Plugins.Add(new ConsulFeature(new JsvServiceClient()) { IncludeDefaultServiceHealth = false });
-            Plugins.Add(new MetadataFeature());
-
-            // set up localhost redis to enable health check
-            container.Register<IRedisClientsManager>(c => new RedisManagerPool("localhost:6379"));
+            Plugins.Add(new ConsulFeature(settings =>
+            {
+                settings.AddServiceCheck(host =>
+                    {
+                        // custom logic for checking service health
+                        // return new HealthCheck(ServiceHealth.Critical, "Out of disk space");
+                        // return new HealthCheck(ServiceHealth.Warning, "Query times are slower than expected");
+                        return new HealthCheck(ServiceHealth.Ok, "working normally");
+                    },
+                    intervalInSeconds: 60);
+                settings.AddTags("one", "two", "three");
+                settings.SetDefaultGateway(url => new CsvServiceClient(url));
+            }));
         }
     }
-     
+
     public class EchoService : Service
     {
-        /// <summary>
-        /// uses the client specified in the ConsulFeature constructor
-        /// </summary>
-        public IServiceClient Client { get; set; }
-
-        public EchoAReply Any(EchoA echo)
+        public object Any(EchoA echo)
         {
             if (!echo.CallRemoteService)
             {
+                // local call
                 return new EchoAReply { Message = "Hello from service A" };
             }
 
-            // this will resolve the correct remote uri using consul for the external DTO
-            var remoteResponse = Client.Post(new EchoB());
+            // call remote service
+            var remoteResponse = Gateway.Send(new EchoB());
             return new EchoAReply { Message = remoteResponse?.Message };
         }
     }

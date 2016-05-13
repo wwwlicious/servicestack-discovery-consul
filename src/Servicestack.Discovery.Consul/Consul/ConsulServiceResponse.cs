@@ -3,19 +3,21 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace ServiceStack.Discovery.Consul
 {
-    using System.Runtime.Serialization;
-
+    /// <summary>
+    /// Represents a consul registered service address
+    /// </summary>
     public class ConsulServiceResponse
     {
-        public string ID { get; set; }
+        public string Node { get; set; }
 
-        public string Service { get; set; }
+        public string ServiceID { get; set; }
 
-        public string[] Tags { get; set; }
+        public string ServiceName { get; set; }
 
-        public string Address { get; set; }
+        public string[] ServiceTags { get; set; }
 
-        [DataMember()]
-        public int Port { get; set; } = 0;
+        public string ServiceAddress { get; set; }
+
+        public int ServicePort { get; set; } = 0;
     }
 }
