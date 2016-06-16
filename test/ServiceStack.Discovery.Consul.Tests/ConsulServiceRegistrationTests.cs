@@ -3,12 +3,9 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace ServiceStack.Discovery.Consul.Tests
 {
-    using System.Linq;
-
     using FluentAssertions;
 
-    using ServiceStack.FluentValidation.TestHelper;
-    using ServiceStack.Text;
+    using FluentValidation.TestHelper;
 
     using Xunit;
 
@@ -65,14 +62,15 @@ namespace ServiceStack.Discovery.Consul.Tests
         [Fact]
         public void DeSerialize_Consul_Service_Json()
         {
-            var result = "{\"Node\":\"X1-Win10\",\"Address\":\"127.0.0.1\",\"ServiceID\":\"ss-ServiceA-7f96fc1c-ab72-4471-bc90-a39cd5591545\",\"ServiceName\":\"api\",\"ServiceTags\":[\"ss-version-2.0\",\"EchoA\",\"one\",\"two\",\"three\"],\"ServiceAddress\":\"http://127.0.0.1:8091/\",\"ServicePort\":8091,\"ServiceEnableTagOverride\":false,\"CreateIndex\":7,\"ModifyIndex\":7}";
-            var service = result.FromJson<ConsulServiceResponse>();
+            var result = "{\"Node\": {\"Node\": \"X1-Win10\",\"Address\": \"127.0.0.1\",\"CreateIndex\": 3,\"ModifyIndex\": 29},\"Service\": {\"ID\": \"ss-ServiceA-7f96fc1c-ab72-4471-bc90-a39cd5591545\",\"Service\": \"api\",\"Tags\": [\"ss-version-2.0\",\"EchoA\",\"one\",\"two\",\"three\"],\"Address\": \"http://127.0.0.1:8091/\",\"Port\": 8091,\"EnableTagOverride\": false,\"CreateIndex\": 7,\"ModifyIndex\": 7},\"Checks\": [{\"Node\": \"X1-Win10\",\"CheckID\": \"serfHealth\",\"Name\": \"Serf Health Status\",\"Status\": \"passing\",\"Notes\": \"\",\"Output\": \"Agent alive and reachable\",\"ServiceID\": \"\",\"ServiceName\": \"\",\"CreateIndex\": 3,\"ModifyIndex\": 3}]}";
 
-            service.ServiceID.Should().Be("ss-ServiceA-7f96fc1c-ab72-4471-bc90-a39cd5591545");
-            service.ServiceTags.Should().BeEquivalentTo("ss-version-2.0", "EchoA", "one", "two", "three");
-            service.ServiceAddress.Should().Be("http://127.0.0.1:8091/");
-            service.ServiceName.Should().Be("api");
-            service.ServicePort.Should().Be(8091);
+            var service = result.FromJson<ConsulHealthResponse>();
+
+            service.Service.ID.Should().Be("ss-ServiceA-7f96fc1c-ab72-4471-bc90-a39cd5591545");
+            service.Service.Tags.Should().BeEquivalentTo("ss-version-2.0", "EchoA", "one", "two", "three");
+            service.Service.Address.Should().Be("http://127.0.0.1:8091/");
+            service.Service.Service.Should().Be("api");
+            service.Service.Port.Should().Be(8091);
         }
     }
 }
