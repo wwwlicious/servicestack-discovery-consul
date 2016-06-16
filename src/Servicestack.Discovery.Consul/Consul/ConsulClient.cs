@@ -118,7 +118,7 @@ namespace ServiceStack.Discovery.Consul
 
             // `passing` filters out any services with critical or warning health states
             // `near=_agent` sorts results by shortest round trip time
-            var healthUri = ConsulUris.LocalAgent.CombineWith(ConsulUris.GetService(serviceName, tagName));
+            var healthUri = ConsulUris.GetService(serviceName, tagName);
             try
             {
                 var response = healthUri.GetJsonFromUrl();

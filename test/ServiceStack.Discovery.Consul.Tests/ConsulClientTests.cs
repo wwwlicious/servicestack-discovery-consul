@@ -44,7 +44,7 @@ namespace ServiceStack.Discovery.Consul.Tests
                 action.ShouldThrow<GatewayServiceDiscoveryException>()
                     .WithMessage("No healthy services are currently registered to process the request of type 'three'")
                     .WithInnerException<WebServiceException>()
-                    .WithInnerMessage("Expected json but received empty or null reponse from http://127.0.0.1:8500/v1/catalog/service/service?near=_agent&passing&tag=three");
+                    .WithInnerMessage("Expected json but received empty or null reponse from http://127.0.0.1:8500/v1/health/service/service?near=_agent&passing&tag=three");
             }
         }
 
@@ -79,7 +79,7 @@ namespace ServiceStack.Discovery.Consul.Tests
             {
                 StringResultFn = (request, s) =>
                 {
-                    if (request.RequestUri.AbsoluteUri == "http://127.0.0.1:8500/v1/catalog/service/api?near=_agent&passing&tag=EchoA")
+                    if (request.RequestUri.AbsoluteUri == "http://127.0.0.1:8500/v1/health/service/api?near=_agent&passing&tag=EchoA")
                     {
                         return @"[{""Node"":""X1-Win10"",""Address"":""127.0.0.1"",""ServiceID"":""ss-ServiceA-7f96fc1c-ab72-4471-bc90-a39cd5591545"",""ServiceName"":""api"",""ServiceTags"":[""ss-version-2.0"",""EchoA"",""one"",""two"",""three""],""ServiceAddress"":""http://127.0.0.1:8091/"",""ServicePort"":8091,""ServiceEnableTagOverride"":false,""CreateIndex"":7,""ModifyIndex"":7},{""Node"":""X1-Win10"",""Address"":""127.0.0.1"",""ServiceID"":""ss-ServiceB-73dff66c-bc91-43f3-92f5-6ee7677b2756"",""ServiceName"":""api"",""ServiceTags"":[""ss-version-1.0"",""EchoB""],""ServiceAddress"":""http://localhost:8092/api/"",""ServicePort"":8092,""ServiceEnableTagOverride"":false,""CreateIndex"":6,""ModifyIndex"":6}]";
                     }
