@@ -8,8 +8,8 @@ namespace ServiceStack.Discovery.Consul
     using System.Net;
 
     using ServiceStack;
-    using ServiceStack.FluentValidation;
-    using ServiceStack.Logging;
+    using FluentValidation;
+    using Logging;
 
     /// <summary>
     /// Consul client deals with consul api calls
@@ -95,7 +95,7 @@ namespace ServiceStack.Discovery.Consul
                     throw new WebServiceException(
                         $"Expected json but received empty or null reponse from {ConsulUris.GetServices(serviceName)}");
 
-                return response.FromJson<ConsulServiceResponse[]>();
+                return GetConsulServiceResponses(response);
             }
             catch (Exception e)
             {
@@ -125,7 +125,7 @@ namespace ServiceStack.Discovery.Consul
                 if (string.IsNullOrWhiteSpace(response))
                     throw new WebServiceException($"Expected json but received empty or null reponse from {healthUri}");
 
-                return response.FromJson<ConsulServiceResponse[]>().First();
+                return GetConsulServiceResponses(response).First();
             }
             catch (Exception e)
             {
@@ -180,6 +180,12 @@ namespace ServiceStack.Discovery.Consul
                     throw new GatewayServiceDiscoveryException($"Could not register service health check {check.Id}", ex);
                 }
             }
+        }
+
+        private static ConsulServiceResponse[] GetConsulServiceResponses(string response)
+        {
+            var health = response.FromJson<ConsulHealthResponse[]>();
+            return health.Select(ConsulServiceResponse.Create).ToArray();
         }
     }
 }

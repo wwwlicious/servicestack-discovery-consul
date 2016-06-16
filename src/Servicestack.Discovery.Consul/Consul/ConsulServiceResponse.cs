@@ -8,16 +8,32 @@ namespace ServiceStack.Discovery.Consul
     /// </summary>
     public class ConsulServiceResponse
     {
-        public string Node { get; set; }
+        public string Node { get; private set; }
 
-        public string ServiceID { get; set; }
+        public string ServiceID { get; private set; }
 
-        public string ServiceName { get; set; }
+        public string ServiceName { get; private set; }
 
-        public string[] ServiceTags { get; set; }
+        public string[] ServiceTags { get; private set; }
 
-        public string ServiceAddress { get; set; }
+        public string ServiceAddress { get; private set; }
 
-        public int ServicePort { get; set; } = 0;
+        public int ServicePort { get; private set; }
+
+        public static ConsulServiceResponse Create(ConsulHealthResponse response)
+        {
+            if (response?.Node == null || (response.Service == null))
+                return null;
+
+            return new ConsulServiceResponse
+            {
+                Node = response.Node.NodeName,
+                ServiceID = response.Service.ID,
+                ServiceName = response.Service.Service,
+                ServiceTags = response.Service.Tags,
+                ServiceAddress = response.Service.Address,
+                ServicePort = response.Service.Port
+            };
+        }
     }
 }

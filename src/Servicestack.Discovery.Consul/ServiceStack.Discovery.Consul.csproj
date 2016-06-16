@@ -72,6 +72,7 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Consul\ConsulHealthResponse.cs" />
     <Compile Include="Discovery\ConsulService.cs" />
     <Compile Include="Discovery\ConsulServiceId.cs" />
     <Compile Include="Discovery\TagExtensions.cs" />
