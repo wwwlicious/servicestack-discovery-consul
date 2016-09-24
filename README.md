@@ -69,6 +69,7 @@ It really is that simple!
 
 Before you start your services, you'll need to [download consul](https://www.consul.io/) and start the agent running on your machine.
 
+### Using the binary
 
 The following will create an in-memory instance which is useful for testing
 
@@ -76,6 +77,15 @@ The following will create an in-memory instance which is useful for testing
 consul.exe agent -dev -advertise="127.0.0.1"
 ```
 You should now be able see the [Consul Agent WebUI](http://127.0.0.1:8500/ui) link appear under **Plugins** on the metadata page.
+
+### Using the offical docker image
+
+```bash
+docker pull consul
+docker run -dp 8500:8500/tcp --name=dev-consul consul agent -dev -ui -client 0.0.0.0
+```
+This will create an in-memory instance using the official docker image
+
 
 ## Under the covers...
 
