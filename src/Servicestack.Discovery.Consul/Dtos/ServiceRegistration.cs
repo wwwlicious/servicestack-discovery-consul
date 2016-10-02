@@ -23,6 +23,6 @@ namespace ServiceStack.Discovery.Consul
         public string Http { get; set; }
         public string Tcp { get; set; }
         public string Notes { get; set; }
-        public int? DeregisterCriticalServiceAfterInSeconds { get; set; }
+        public int? DeregisterCriticalServiceAfterInMinutes { get; set; }
     }
 }

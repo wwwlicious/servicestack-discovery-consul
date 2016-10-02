@@ -154,7 +154,7 @@ namespace ServiceStack.Discovery.Consul
                         TCP = check.Tcp,
                         IntervalInSeconds = check.IntervalInSeconds,
                         Notes = check.Notes,
-                        
+                        DeregisterCriticalServiceAfterInMinutes = check.DeregisterCriticalServiceAfterInMinutes
                     };
                     HealthcheckValidator.ValidateAndThrow(consulCheck);
 
