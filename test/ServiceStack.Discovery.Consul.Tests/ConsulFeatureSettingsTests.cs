@@ -2,7 +2,6 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/. 
 
-using System;
 using FluentAssertions;
 using Xunit;
 
@@ -77,7 +76,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         [Fact]
         public void CanAddServiceChecks()
         {
-            settings.AddServiceCheck(new ConsulRegisterCheck("checkone", "id1") { HTTP = "test", IntervalInSeconds = 10 });
+            settings.AddServiceCheck(new ConsulRegisterCheck("checkone", "id1") { HTTP = "http://test", IntervalInSeconds = 10 });
 
             var check = settings.GetServiceChecks().Should().ContainSingle().Subject;
             check.Name.Should().Be("checkone");

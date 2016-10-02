@@ -12,7 +12,7 @@ copy of the .Net CLR request type.
 
 Your services will not need to take **any dependencies** on each other 
 and as you deploy updates to your services they will **automatically be registered** 
-and used without reconfiguing the existing services.
+and used without reconfiguring the existing services.
 
 The automatic and customisable health checks for each service will 
 also ensure that **failing services will not be used**, or if you 
@@ -103,12 +103,15 @@ started it up, it will [self-register](http://microservices.io/patterns/self-reg
 
 ![Default Health Checks](assets/HealthChecks.png)
 
-Each service can have any number of health checks. These checks are run by Consul and allow service discovery to filter out failing instances of your services.
+Each service can have any number of health checks. These checks are run by Consul and allow service discovery 
+to filter out failing instances of your services.
 
 By default the plugin creates 2 health checks
 
 1. Heartbeat : Creates an endpoint in your service [http://locahost:1234/reply/json/heartbeat](http://locahost:1234/reply/json/heartbeat) that expects a 200 response
 2. If Redis has been configured in the AppHost, it will check Redis is responding
+
+*NB From Consul 0.7 onwards, if the heartbeat check fails for 90 minutes, the service will automatically be unregistered*
 
 You can turn off the default health checks by setting the following property:
 
@@ -136,7 +139,8 @@ new ConsulFeature(settings =>
         ...ok check 
         return new HealthCheck(ServiceHealth.Ok, "working normally");
     },
-    intervalInSeconds: 60 // default check once per minute
+    intervalInSeconds: 60 // default check once per minute,
+    deregisterIfCriticalAfterInMinutes: null // deregisters the service if health is critical after x minutes, null = disabled by default
     );
 });
 ```

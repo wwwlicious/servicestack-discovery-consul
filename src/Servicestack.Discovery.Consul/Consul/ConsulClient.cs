@@ -154,6 +154,7 @@ namespace ServiceStack.Discovery.Consul
                         TCP = check.Tcp,
                         IntervalInSeconds = check.IntervalInSeconds,
                         Notes = check.Notes,
+                        
                     };
                     HealthcheckValidator.ValidateAndThrow(consulCheck);
 
