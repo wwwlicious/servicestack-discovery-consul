@@ -3,13 +3,9 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace ServiceStack.Discovery.Consul.Tests
 {
-    using System.Linq;
-
     using FluentAssertions;
 
     using ServiceStack.FluentValidation.TestHelper;
-    using ServiceStack.Text;
-
     using Xunit;
 
     public class ConsulServiceRegistrationTests

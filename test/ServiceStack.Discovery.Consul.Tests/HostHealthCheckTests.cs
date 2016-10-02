@@ -45,5 +45,14 @@ namespace ServiceStack.Discovery.Consul.Tests
 
             check.IntervalInSeconds.Should().Be(23);
         }
+
+        [Fact]
+        public void CanAssignDeregister()
+        {
+            var healthCheck = new HealthCheck(ServiceHealth.Ok, "ok");
+            var check = new HostHealthCheck(host => healthCheck,deregisterIfCriticalAfterInMinutes: 23);
+
+            check.DeregisterIfCriticalAfterInMinutes.Should().Be(23);
+        }
     }
 }

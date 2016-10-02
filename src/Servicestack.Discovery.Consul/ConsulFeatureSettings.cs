@@ -61,9 +61,10 @@ namespace ServiceStack.Discovery.Consul
         /// </summary>
         /// <param name="check">a delegate to represent a service health check</param>
         /// <param name="intervalInSeconds">the timed interval for running this check in seconds</param>
-        public void AddServiceCheck(HealthCheckDelegate check, int intervalInSeconds = 60)
+        /// <param name="deregisterIfCriticalAfterInMinutes">Instructs consul to deregister the service if the service check is failing after x minutes</param>
+        public void AddServiceCheck(HealthCheckDelegate check, int intervalInSeconds = 60, int? deregisterIfCriticalAfterInMinutes = null)
         {
-            healthCheck = new HostHealthCheck(check, intervalInSeconds);
+            healthCheck = new HostHealthCheck(check, intervalInSeconds, deregisterIfCriticalAfterInMinutes);
         }
 
         /// <summary>

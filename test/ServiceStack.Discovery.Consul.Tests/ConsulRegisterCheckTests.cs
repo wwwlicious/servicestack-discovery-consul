@@ -4,7 +4,7 @@
 namespace ServiceStack.Discovery.Consul.Tests
 {
     using FluentAssertions;
-
+    using ServiceStack.FluentValidation;
     using ServiceStack.FluentValidation.TestHelper;
 
     using Xunit;
@@ -16,6 +16,18 @@ namespace ServiceStack.Discovery.Consul.Tests
         public ConsulRegisterCheckTests()
         {
             validator = new ConsulRegisterCheckValidator();
+        }
+
+        [Fact]
+        public void NoValidation_IsThrown_ForMinRequired()
+        {
+            validator.ValidateAndThrow(new ConsulRegisterCheck("name") {HTTP = "http://test", IntervalInSeconds = 1});
+        }
+
+        [Fact]
+        public void Http_MustBe_ValidUrl()
+        {
+            validator.ShouldHaveValidationErrorFor(x => x.HTTP, new ConsulRegisterCheck("a") {HTTP = "t", IntervalInSeconds = 1});
         }
 
         [Theory]
@@ -56,13 +68,24 @@ namespace ServiceStack.Discovery.Consul.Tests
         [InlineData(-1)]
         public void Interval_Must_Be_Greater_Than_Zero_If_Specified(int seconds)
         {
-            validator.ShouldHaveValidationErrorFor(x => x.IntervalInSeconds, new ConsulRegisterCheck("a") { Script = "a", IntervalInSeconds = seconds });
+            validator.ShouldHaveValidationErrorFor(x => x.IntervalInSeconds,
+                new ConsulRegisterCheck("a") { Script = "a", IntervalInSeconds = seconds });
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        public void DeregisterCriticalServiceAfterInMinutes_Must_Be_Greater_Than_Zero_If_Specified(int minutes)
+        {
+            validator.ShouldHaveValidationErrorFor(x => x.DeregisterCriticalServiceAfterInMinutes,
+                new ConsulRegisterCheck("a") { DeregisterCriticalServiceAfterInMinutes = minutes });
         }
 
         [Fact]
         public void Shell_Is_Required_If_DockerContainerId_Is_Specified()
         {
-            validator.ShouldHaveValidationErrorFor(x => x.Shell, new ConsulRegisterCheck("a") { DockerContainerID = "a" });
+            validator.ShouldHaveValidationErrorFor(x => x.Shell,
+                new ConsulRegisterCheck("a") { DockerContainerID = "a" });
         }
 
         [Theory]

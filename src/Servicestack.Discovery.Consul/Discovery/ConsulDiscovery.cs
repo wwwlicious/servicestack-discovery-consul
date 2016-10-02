@@ -156,7 +156,8 @@ namespace ServiceStack.Discovery.Consul
         private ServiceHealthCheck CreateCustomCheck(string baseUrl, string serviceId)
         {
             var settings = HostContext.GetPlugin<ConsulFeature>().Settings;
-            if (settings.GetHealthCheck() == null)
+            var customHealthCheck = settings.GetHealthCheck();
+            if (customHealthCheck == null)
             {
                 return null;
             }
@@ -165,7 +166,8 @@ namespace ServiceStack.Discovery.Consul
             {
                 Id = "SS-HealthCheck",
                 ServiceId = serviceId,
-                IntervalInSeconds = settings.GetHealthCheck().IntervalInSeconds,
+                IntervalInSeconds = customHealthCheck.IntervalInSeconds,
+                DeregisterCriticalServiceAfterInMinutes = customHealthCheck.DeregisterIfCriticalAfterInMinutes,
                 Http = baseUrl.CombineWith("/json/reply/healthcheck"),
                 Notes = "This check is an HTTP GET request which expects the service to return 200 OK"
             };
@@ -216,7 +218,8 @@ namespace ServiceStack.Discovery.Consul
                 ServiceId = serviceId,
                 IntervalInSeconds = 30,
                 Http = baseUrl.CombineWith("/json/reply/heartbeat"),
-                Notes = "A heartbeat service to check if the service is reachable, expects 200 response"
+                Notes = "A heartbeat service to check if the service is reachable, expects 200 response",
+                DeregisterCriticalServiceAfterInMinutes = 90
             };
         }
     }
