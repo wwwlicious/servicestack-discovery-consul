@@ -10,12 +10,14 @@ namespace ServiceStack.Discovery.Consul
         /// </summary>
         /// <param name="healthCheckDelegate"></param>
         /// <param name="intervalInSeconds"></param>
-        public HostHealthCheck(HealthCheckDelegate healthCheckDelegate, int intervalInSeconds = 60)
+        /// <param name="deregisterIfCriticalAfterInMinutes"></param>
+        public HostHealthCheck(HealthCheckDelegate healthCheckDelegate, int intervalInSeconds = 60, int? deregisterIfCriticalAfterInMinutes = null)
         {
             healthCheckDelegate.ThrowIfNull(nameof(healthCheckDelegate));
             
             HealthCheckDelegate = healthCheckDelegate;
             IntervalInSeconds = intervalInSeconds;
+            DeregisterIfCriticalAfterInMinutes = deregisterIfCriticalAfterInMinutes;
         }
 
         /// <summary>
@@ -27,5 +29,10 @@ namespace ServiceStack.Discovery.Consul
         /// How often the check is run, defaults to 60 seconds
         /// </summary>
         public int IntervalInSeconds { get; set; }
+
+        /// <summary>
+        /// If health check is failing after x minutes, will deregister service, leave as default(null) to disable
+        /// </summary>
+        public int? DeregisterIfCriticalAfterInMinutes { get; set; }
     }
 }
