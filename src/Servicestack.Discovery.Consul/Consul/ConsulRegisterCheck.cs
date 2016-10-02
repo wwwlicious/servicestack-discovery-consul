@@ -74,6 +74,14 @@ namespace ServiceStack.Discovery.Consul
 
         public string Interval => IntervalInSeconds?.ToString("0s");
 
+        /// <summary>
+        /// Deregisters a service with critical health after x minutes
+        /// </summary>
+        [IgnoreDataMember]
+        public double? DeregisterCriticalServiceAfterInMinutes { get; set; }
+
+        public string DeregisterCriticalServiceAfter => DeregisterCriticalServiceAfterInMinutes?.ToString("0m");
+
         [IgnoreDataMember]
         public string AclToken { get; set; }
 
