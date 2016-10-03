@@ -12,7 +12,7 @@ namespace ServiceStack.Discovery.Consul
     /// <summary>
     /// Manages register, unregister, holds registration state
     /// </summary>
-    public class ConsulDiscovery : IDiscovery
+    public class ConsulDiscovery : IServiceDiscovery<ConsulService, ServiceRegistration>
     {
         /// <summary>
         /// Contains the service registration information

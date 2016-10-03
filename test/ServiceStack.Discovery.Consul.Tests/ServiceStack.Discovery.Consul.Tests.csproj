@@ -109,7 +109,7 @@
     <Compile Include="ConsulServiceRegistrationTests.cs" />
     <Compile Include="ConsulTests.cs" />
     <Compile Include="HealthCheckServiceTests.cs" />
-    <Compile Include="Helpers\TestDiscovery.cs" />
+    <Compile Include="Helpers\TestServiceDiscovery.cs" />
     <Compile Include="HostHealthCheckTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TagExtensionsTests.cs" />

@@ -11,13 +11,13 @@ namespace ServiceStack.Discovery.Consul
     {
         private readonly DefaultGatewayDelegate defaultGateway;
 
-        private readonly IDiscovery discoveryClient;
+        private readonly IServiceDiscovery<ConsulService, ServiceRegistration> discoveryClient;
 
         private readonly ConcurrentDictionary<string, HttpCacheEntry> sharedCache = new ConcurrentDictionary<string, HttpCacheEntry>();
 
         public HashSet<Type> LocalTypes { get; set; }
 
-        public ConsulServiceGatewayFactory(DefaultGatewayDelegate defaultGateway, IDiscovery discoveryClient)
+        public ConsulServiceGatewayFactory(DefaultGatewayDelegate defaultGateway, IServiceDiscovery<ConsulService, ServiceRegistration> discoveryClient)
         {
             defaultGateway.ThrowIfNull(nameof(defaultGateway));
             discoveryClient.ThrowIfNull(nameof(discoveryClient));

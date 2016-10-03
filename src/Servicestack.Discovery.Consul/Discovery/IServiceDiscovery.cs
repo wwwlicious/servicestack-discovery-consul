@@ -6,12 +6,17 @@ namespace ServiceStack.Discovery.Consul
     using System;
     using System.Collections.Generic;
 
-    public interface IDiscovery
+    /// <summary>
+    /// Interface used for service discovery
+    /// </summary>
+    /// <typeparam name="TServiceModel">The DTO for service information</typeparam>
+    /// <typeparam name="TServiceRegistration">The DTO for the AppHost registration</typeparam>
+    public interface IServiceDiscovery<out TServiceModel, out TServiceRegistration> where TServiceModel : class where TServiceRegistration : class
     {
         /// <summary>
         /// Holds the current service registration
         /// </summary>
-        ServiceRegistration Registration { get; }
+        TServiceRegistration Registration { get; }
 
         /// <summary>
         /// Registers the service for discovery
@@ -22,23 +27,23 @@ namespace ServiceStack.Discovery.Consul
         /// <summary>
         /// Unregisters the service from discovery
         /// </summary>
-        /// <param name="host"></param>
+        /// <param name="host">the apphost</param>
         void Unregister(IAppHost host);
 
         /// <summary>
         /// Returns a list of available services
         /// </summary>
-        /// <param name="serviceName"></param>
-        /// <returns></returns>
-        ConsulService[] GetServices(string serviceName);
+        /// <param name="serviceName">the service name</param>
+        /// <returns>the matching services</returns>
+        TServiceModel[] GetServices(string serviceName);
 
         /// <summary>
         /// Returns a single service for a dto
         /// </summary>
-        /// <param name="serviceName"></param>
-        /// <param name="dtoName"></param>
-        /// <returns></returns>
-        ConsulService GetService(string serviceName, string dtoName);
+        /// <param name="serviceName">the service name</param>
+        /// <param name="dtoName">the request dto name</param>
+        /// <returns>the service dto</returns>
+        TServiceModel GetService(string serviceName, string dtoName);
 
         /// <summary>
         /// Inspects the IAppHost and returns a list of strings that will represent the RequestDTO types

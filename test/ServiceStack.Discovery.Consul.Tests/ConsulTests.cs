@@ -26,9 +26,9 @@ namespace ServiceStack.Discovery.Consul.Tests
             var remoteuri = "http://remoteuri:1234/api/";
             var expected = remoteuri.CombineWith("/json/reply/ConsulTests.TestDTO");
 
-            var discovery = new TestDiscovery();
+            var discovery = new TestServiceDiscovery();
             discovery.DtoTypes.Add(typeof(TestDTO), remoteuri);
-            plugin.Settings.AddDiscoveryTypeResolver(discovery);
+            plugin.Settings.AddServiceDiscovery(discovery);
 
             Consul.ResolveTypedUrl(new JsonServiceClient("http://localhost/"), "GET", new TestDTO()).Should().Be(expected);
         }
@@ -38,7 +38,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         {
             var baseUri = "http://testuri/";
             var expected = baseUri.CombineWith("/json/reply/ConsulTests.TestDTO");
-            plugin.Settings.AddDiscoveryTypeResolver(new TestDiscovery());
+            plugin.Settings.AddServiceDiscovery(new TestServiceDiscovery());
 
             Consul.ResolveTypedUrl(new JsonServiceClient(baseUri), null, new TestDTO()).Should().Be(expected);
         }
@@ -46,7 +46,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         [Fact]
         public void Resolver_ReturnsNull_ForUnregisteredType()
         {
-            plugin.Settings.AddDiscoveryTypeResolver(new TestDiscovery());
+            plugin.Settings.AddServiceDiscovery(new TestServiceDiscovery());
 
             Consul.ResolveTypedUrl(null, null, new TestDTO()).Should().BeNull();
         }
@@ -59,10 +59,10 @@ namespace ServiceStack.Discovery.Consul.Tests
         [InlineData("PATCH", "/patch/dto2")]
         public void Resolver_ReturnsRegisteredType_ByName(string method, string expected)
         {
-            var discovery = new TestDiscovery();
+            var discovery = new TestServiceDiscovery();
             var remoteuri = "http://remoteUri:1234/";
             discovery.DtoTypes.Add(typeof(TestDTO2), remoteuri);
-            plugin.Settings.AddDiscoveryTypeResolver(discovery);
+            plugin.Settings.AddServiceDiscovery(discovery);
 
             Consul.ResolveTypedUrl(new JsonServiceClient("http://localhost"), method, new TestDTO2()).Should().Be(remoteuri.CombineWith(expected));
         }

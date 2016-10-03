@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ServiceStack.Discovery.Consul</RootNamespace>
     <AssemblyName>ServiceStack.Discovery.Consul</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -23,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <RunCodeAnalysis>true</RunCodeAnalysis>
+    <DocumentationFile>bin\Debug\ServiceStack.Discovery.Consul.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -98,7 +99,7 @@
     <Compile Include="Exceptions\GatewayServiceDiscoveryException.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="HostHealthCheck.cs" />
-    <Compile Include="Discovery\IDiscovery.cs" />
+    <Compile Include="Discovery\IServiceDiscovery.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Consul\ConsulClient.cs" />
     <Compile Include="Dtos\ServiceRegistration.cs" />

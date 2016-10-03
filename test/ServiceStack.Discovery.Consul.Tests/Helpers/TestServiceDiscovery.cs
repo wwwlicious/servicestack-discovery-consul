@@ -7,9 +7,9 @@ namespace ServiceStack.Discovery.Consul.Tests
     using System.Collections.Generic;
     using System.Linq;
 
-    public class TestDiscovery : IDiscovery
+    public class TestServiceDiscovery : IServiceDiscovery<ConsulService, ServiceRegistration>
     {
-        public TestDiscovery(params KeyValuePair<Type, string>[] dtoTypes)
+        public TestServiceDiscovery(params KeyValuePair<Type, string>[] dtoTypes)
         {
             DtoTypes = dtoTypes.ToDictionary(x => x.Key, y => y.Value);
         }
