@@ -23,7 +23,7 @@ namespace ServiceStack.Discovery.Consul.Tests
             plugins.Add(new NativeTypesFeature());
             plugins.Add(new ConsulFeature(settings =>
             {
-                settings.AddDiscoveryTypeResolver(new TestDiscovery(TestTypes));
+                settings.AddServiceDiscovery(new TestServiceDiscovery(TestTypes));
             }));
 
             Host = new BasicAppHost

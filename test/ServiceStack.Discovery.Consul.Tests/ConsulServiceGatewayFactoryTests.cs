@@ -16,7 +16,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         [Fact]
         public void Ctor_Requires_DefaultGatewayDelegate()
         {
-            Action action = () => new ConsulServiceGatewayFactory(null, new TestDiscovery());
+            Action action = () => new ConsulServiceGatewayFactory(null, new TestServiceDiscovery());
             action.ShouldThrow<ArgumentNullException>().And.ParamName.Should().Be("defaultGateway");
         }
 
@@ -30,7 +30,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         [Fact]
         public void Gateway_Ignores_LocalTypes()
         {
-            var gateway = new ConsulServiceGatewayFactory(uri => new CsvServiceClient(uri), new TestDiscovery());
+            var gateway = new ConsulServiceGatewayFactory(uri => new CsvServiceClient(uri), new TestServiceDiscovery());
             gateway.LocalTypes.Add(typeof(ConsulServiceGatewayFactoryTests));
 
             var serviceGateway = gateway.GetGateway(typeof(ConsulServiceGatewayFactoryTests));
@@ -41,7 +41,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         [Fact]
         public void Gateway_ReturnsCorrectly_ForNonLocalTypes()
         {
-            var resolver = new TestDiscovery(new KeyValuePair<Type, string>(typeof(ConsulServiceGatewayFactoryTests), "http://banana"));
+            var resolver = new TestServiceDiscovery(new KeyValuePair<Type, string>(typeof(ConsulServiceGatewayFactoryTests), "http://banana"));
             var gateway = new ConsulServiceGatewayFactory(uri => new CsvServiceClient(uri) { Version = 123 }, resolver);
             gateway.LocalTypes.Clear();
 

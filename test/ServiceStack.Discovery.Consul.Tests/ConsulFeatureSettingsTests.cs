@@ -54,8 +54,8 @@ namespace ServiceStack.Discovery.Consul.Tests
         [Fact]
         public void CanOverrideDiscoveryClient()
         {
-            var client = new TestDiscovery();
-            settings.AddDiscoveryTypeResolver(client);
+            var client = new TestServiceDiscovery();
+            settings.AddServiceDiscovery(client);
 
             settings.GetDiscoveryClient().Should().Be(client);
         }

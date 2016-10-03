@@ -20,7 +20,7 @@ namespace ServiceStack.Discovery.Consul
 
         private readonly List<ConsulRegisterCheck> serviceChecks = new List<ConsulRegisterCheck>();
 
-        private IDiscovery discoveryClient;
+        private IServiceDiscovery<ConsulService, ServiceRegistration> discoveryClient;
 
         private HostHealthCheck healthCheck;
 
@@ -71,7 +71,7 @@ namespace ServiceStack.Discovery.Consul
         /// Override the default discovery consul client
         /// </summary>
         /// <param name="discoveryClient">the IDiscovery client</param>
-        public void AddDiscoveryTypeResolver(IDiscovery discoveryClient)
+        public void AddServiceDiscovery(IServiceDiscovery<ConsulService, ServiceRegistration> discoveryClient)
         {
             this.discoveryClient = discoveryClient;
         }
@@ -125,7 +125,7 @@ namespace ServiceStack.Discovery.Consul
         /// Gets the type resolver used for service discovery
         /// </summary>
         /// <returns></returns>
-        public IDiscovery GetDiscoveryClient()
+        public IServiceDiscovery<ConsulService, ServiceRegistration> GetDiscoveryClient()
         {
             return discoveryClient;
         }

@@ -171,7 +171,7 @@ namespace ServiceStack.Discovery.Consul
                             }
                             else
                             {
-                                logger.Info($"Registered health check with Consul `{check}`");
+                                logger.Info($"Registered health check with Consul `{check.Id}`");
                             }
                         });
                 }

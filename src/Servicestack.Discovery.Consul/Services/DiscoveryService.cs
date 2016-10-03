@@ -10,7 +10,7 @@ namespace ServiceStack.Discovery.Consul
         private GetServiceValidator GetServiceValidator { get; set; } = new GetServiceValidator();
 
         // return current registration and health info
-        public IDiscovery Discovery { get; set; }
+        public IServiceDiscovery<ConsulService, ServiceRegistration> Discovery { get; set; }
 
         public object Any(ServiceRegistration registration)
         {
