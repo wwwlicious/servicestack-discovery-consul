@@ -43,7 +43,7 @@ namespace ServiceStack.Discovery.Consul
         /// <param name="serviceName">the service name</param>
         /// <param name="dtoName">the request dto name</param>
         /// <returns>the service dto</returns>
-        TServiceModel GetService(string serviceName, string dtoName);
+        TServiceModel GetService(string serviceName, string dtoName, Version minVersion = null);
 
         /// <summary>
         /// Inspects the IAppHost and returns a list of strings that will represent the RequestDTO types
@@ -66,5 +66,12 @@ namespace ServiceStack.Discovery.Consul
         /// <param name="dtoType">The request dto type</param>
         /// <returns>the BaserUri that will serve this request</returns>
         string ResolveBaseUri(Type dtoType);
+
+
+        ConsulService ResolveService(object dto);
+
+
+        ConsulService ResolveService(Type dtoType);
+
     }
 }

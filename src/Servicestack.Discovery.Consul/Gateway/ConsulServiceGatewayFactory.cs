@@ -29,18 +29,19 @@ namespace ServiceStack.Discovery.Consul
 
         public override IServiceGateway GetGateway(Type requestType)
         {
-            if (LocalTypes.Contains(requestType))
-                return localGateway;
+            //if (LocalTypes.Contains(requestType))
+            //    return localGateway;
+            // +		requestType.Assembly.GetName().Version	{2.0.1.0}	System.Version
 
-            var baseUri = discoveryClient.ResolveBaseUri(requestType);
-            if (string.IsNullOrWhiteSpace(baseUri))
+            var service = discoveryClient.ResolveService(requestType);
+            if (string.IsNullOrWhiteSpace(service?.Address))
             {
                 throw new WebServiceException($"Could not resolve the uri in consul for external requestType {requestType.Name}");
             }
 
             // gateway creation delegate
-            var serviceGateway = defaultGateway(baseUri);
-            
+            var serviceGateway = defaultGateway(service);
+
             // return if delegate is already using cachedclient
             if (serviceGateway is CachedServiceClient) return serviceGateway;
 

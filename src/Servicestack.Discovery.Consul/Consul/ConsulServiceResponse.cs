@@ -1,6 +1,8 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
+using System.Collections.Generic;
+
 namespace ServiceStack.Discovery.Consul
 {
     /// <summary>
@@ -33,6 +35,17 @@ namespace ServiceStack.Discovery.Consul
                 ServiceTags = response.Service.Tags,
                 ServiceAddress = response.Service.Address,
                 ServicePort = response.Service.Port
+            };
+        }
+
+        public static ConsulServiceResponse Create(KeyValuePair<string, List<string>> services)
+        {
+
+            return new ConsulServiceResponse
+            {
+
+                ServiceName = services.Key,
+                ServiceTags = services.Value.ToArray(),
             };
         }
     }

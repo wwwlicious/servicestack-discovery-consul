@@ -8,6 +8,7 @@ namespace ServiceStack.Discovery.Consul
     using System.Linq;
     using ServiceStack.Logging;
     using ServiceStack.Redis;
+    using System.Net;
 
     /// <summary>
     /// Manages register, unregister, holds registration state
@@ -28,13 +29,15 @@ namespace ServiceStack.Discovery.Consul
             // get endpoint http://url:port/path and version
             var baseUrl = appHost.Config.WebHostUrl.CombineWith(appHost.Config.HandlerFactoryPath);
             var dtoTypes = GetRequestTypes(appHost);
-            var customTags = appHost.GetPlugin<ConsulFeature>().Settings.GetCustomTags();
-
+            var consulFeature = appHost.GetPlugin<ConsulFeature>();
+            var customTags = consulFeature.Settings.GetCustomTags();
+            string serviceName = consulFeature.Settings?.ServiceName ?? HostContext.ServiceName;
+            string serviceId = consulFeature.Settings?.ServiceId ?? $"{serviceName}-{appHost.Config.ApiVersion}";
             // construct registration 
             var registration = new ServiceRegistration
             {
-                Name = "api",
-                Id = $"ss-{HostContext.ServiceName}-{Guid.NewGuid()}",
+                Name = serviceName,
+                Id = $"ss-{serviceId}",
                 Address = baseUrl,
                 Version = GetVersion(),
                 Port = GetPort(baseUrl)
@@ -45,7 +48,7 @@ namespace ServiceStack.Discovery.Consul
             tags.AddRange(dtoTypes.Select(x => x.Name));
             tags.AddRange(customTags);
             registration.Tags = tags.ToArray();
-            
+
             // register the service and healthchecks with consul
             ConsulClient.RegisterService(registration);
             var heathChecks = CreateHealthChecks(registration);
@@ -83,9 +86,9 @@ namespace ServiceStack.Discovery.Consul
             return response.Select(x => new ConsulService(x)).ToArray();
         }
 
-        public ConsulService GetService(string serviceName, string dtoName)
+        public ConsulService GetService(string serviceName, string dtoName, Version minVersion = null)
         {
-            var response = ConsulClient.GetService(serviceName, dtoName);
+            var response = ConsulClient.GetService(serviceName, dtoName, minVersion);
             return new ConsulService(response);
         }
 
@@ -113,7 +116,19 @@ namespace ServiceStack.Discovery.Consul
             // handles all tag matching, healthy and lowest round trip time (rtt)
             // throws GatewayServiceDiscoveryException back to the Gateway 
             // to allow retry/exception handling at call site
-            return GetService(Registration.Name, dtoType.Name)?.Address;
+            return GetService(Registration?.Name, dtoType.Name)?.Address;
+        }
+        public ConsulService ResolveService(object dto)
+        {
+            return ResolveService(dto.GetType());
+        }
+
+        public ConsulService ResolveService(Type dtoType)
+        {
+            // handles all tag matching, healthy and lowest round trip time (rtt)
+            // throws GatewayServiceDiscoveryException back to the Gateway 
+            // to allow retry/exception handling at call site
+            return GetService(Registration?.Name, dtoType.Name, dtoType.Assembly.GetName().Version);
         }
 
         private ServiceHealthCheck[] CreateHealthChecks(ServiceRegistration registration)
@@ -168,7 +183,7 @@ namespace ServiceStack.Discovery.Consul
                 ServiceId = serviceId,
                 IntervalInSeconds = customHealthCheck.IntervalInSeconds,
                 DeregisterCriticalServiceAfterInMinutes = customHealthCheck.DeregisterIfCriticalAfterInMinutes,
-                Http = baseUrl.CombineWith("/json/reply/healthcheck"),
+                Http = baseUrl.CombineWith(new HealthCheck().ToGetUrl()),
                 Notes = "This check is an HTTP GET request which expects the service to return 200 OK"
             };
         }
@@ -187,12 +202,15 @@ namespace ServiceStack.Discovery.Consul
                 {
                     if (redisClient != null)
                     {
+                        var host = Dns.GetHostEntry(redisClient.Host);
+                        var ip = host.AddressList.First(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+
                         var redisHealthCheck = new ServiceHealthCheck
                         {
                             Id = "SS-Redis",
                             ServiceId = serviceId,
                             IntervalInSeconds = 10,
-                            Tcp = $"{redisClient.Host}:{redisClient.Port}",
+                            Tcp = $"{ip}:{redisClient.Port}",
                             Notes = "This check ensures that redis is responding correctly"
                         };
                         return redisHealthCheck;
@@ -217,10 +235,11 @@ namespace ServiceStack.Discovery.Consul
                 Id = "SS-Heartbeat",
                 ServiceId = serviceId,
                 IntervalInSeconds = 30,
-                Http = baseUrl.CombineWith("/json/reply/heartbeat"),
+                Http = baseUrl.CombineWith(new Heartbeat().ToGetUrl()),
                 Notes = "A heartbeat service to check if the service is reachable, expects 200 response",
                 DeregisterCriticalServiceAfterInMinutes = 90
             };
         }
+
     }
 }

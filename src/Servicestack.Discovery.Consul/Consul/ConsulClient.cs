@@ -10,6 +10,9 @@ namespace ServiceStack.Discovery.Consul
     using ServiceStack;
     using FluentValidation;
     using Logging;
+    using Text;
+    using System.Collections.Generic;
+
 
     /// <summary>
     /// Consul client deals with consul api calls
@@ -26,13 +29,14 @@ namespace ServiceStack.Discovery.Consul
         public static void RegisterService(ServiceRegistration registration)
         {
             var consulServiceRegistration = new ConsulServiceRegistration(registration.Id, registration.Name)
-                                   {
-                                        Address = registration.Address,
-                                        Tags = registration.Tags,
-                                        Port = registration.Port
-                                   };
+            {
+                Address = registration.Address,
+                Tags = registration.Tags,
+                Port = registration.Port
+            };
 
             ServiceValidator.ValidateAndThrow(consulServiceRegistration);
+
 
             var registrationUrl = ConsulUris.LocalAgent.CombineWith(consulServiceRegistration.ToPutUrl());
             registrationUrl.PostJsonToUrl(consulServiceRegistration, null,
@@ -48,12 +52,11 @@ namespace ServiceStack.Discovery.Consul
                     else
                     {
                         logger.Info($"Registered service with Consul {consulServiceRegistration}");
-                        AppDomain.CurrentDomain.ProcessExit +=
-                            (sender, args) => UnregisterService(consulServiceRegistration.ID);
-                        AppDomain.CurrentDomain.UnhandledException +=
-                            (sender, args) => UnregisterService(consulServiceRegistration.ID);
+                        AppDomain.CurrentDomain.ProcessExit += (sender, args) => UnregisterService(consulServiceRegistration.ID);
+                        AppDomain.CurrentDomain.UnhandledException += (sender, args) => UnregisterService(consulServiceRegistration.ID);
                     }
                 });
+
         }
 
         /// <summary>
@@ -63,21 +66,23 @@ namespace ServiceStack.Discovery.Consul
         /// <exception cref="GatewayServiceDiscoveryException">throws exception if unregistration was not successful</exception>
         public static void UnregisterService(string serviceId)
         {
+
             ConsulUris.DeregisterService(serviceId).GetJsonFromUrl(
-                null,
-                response =>
-                    {
-                        var logger = LogManager.GetLogger(typeof(ConsulClient));
-                        if (response.StatusCode != HttpStatusCode.OK)
-                        {
-                            logger.Error($"Consul failed to unregister service `{serviceId}`");
-                            throw new GatewayServiceDiscoveryException($"Failed to unregister service: {serviceId}");
-                        }
-                        else
-                        {
-                            logger.Debug($"Consul unregistered service: {serviceId}");
-                        }
-                    });
+              null,
+              response =>
+                  {
+                      var logger = LogManager.GetLogger(typeof(ConsulClient));
+                      if (response.StatusCode != HttpStatusCode.OK)
+                      {
+                          logger.Error($"Consul failed to unregister service '{serviceId}'");
+                          throw new GatewayServiceDiscoveryException($"Failed to unregister service: {serviceId}");
+                      }
+                      else
+                      {
+                          logger.Debug($"Consul unregistered service: {serviceId}");
+                      }
+                  });
+
         }
 
         /// <summary>
@@ -85,17 +90,21 @@ namespace ServiceStack.Discovery.Consul
         /// </summary>
         /// <returns>service id's and tags</returns>
         /// <exception cref="GatewayServiceDiscoveryException">throws exception if unable to get services</exception>
-        public static ConsulServiceResponse[] GetServices(string serviceName)
+        public static ConsulServiceResponse[] GetServices(string tagName)
         {
+            ///
             try
             {
-                var response = ConsulUris.GetServices(serviceName).GetJsonFromUrl();
+                var response = ConsulUris.GetServices.GetJsonFromUrl();
 
                 if (string.IsNullOrWhiteSpace(response))
-                    throw new WebServiceException(
-                        $"Expected json but received empty or null reponse from {ConsulUris.GetServices(serviceName)}");
+                {
+                    throw new WebServiceException($"Expected json but received empty or null reponse from {ConsulUris.GetServices}");
+                }
+                var items = JsonSerializer.DeserializeFromString<Dictionary<string, List<string>>>(response);
 
-                return GetConsulServiceResponses(response);
+                var result = items.Where(x => x.Value != null && x.Value.Contains(tagName)).Select(x => ConsulServiceResponse.Create(x)).ToArray();
+                return result;
             }
             catch (Exception e)
             {
@@ -103,6 +112,7 @@ namespace ServiceStack.Discovery.Consul
                 LogManager.GetLogger(typeof(ConsulClient)).Error(message, e);
                 throw new GatewayServiceDiscoveryException(message, e);
             }
+
         }
 
         /// <summary>
@@ -110,29 +120,50 @@ namespace ServiceStack.Discovery.Consul
         /// </summary>
         /// <param name="serviceName">The global service name for servicestack services</param>
         /// <param name="tagName">the tagName to find the service for</param>
+        /// <param name="minVersion">the minimal version of the service defining the tag</param>
         /// <returns>The service for the tagName</returns>
         /// <exception cref="GatewayServiceDiscoveryException">throws exception if no service available for dto</exception>
-        public static ConsulServiceResponse GetService(string serviceName, string tagName)
+        public static ConsulServiceResponse GetService(string serviceName, string tagName, Version minVersion = null)
         {
             // todo add flag to allow warning services to be included in results
 
             // `passing` filters out any services with critical or warning health states
             // `near=_agent` sorts results by shortest round trip time
-            var healthUri = ConsulUris.GetService(serviceName, tagName);
+            List<ConsulServiceResponse> passingResponses = new List<ConsulServiceResponse>();
+            string version = minVersion.ToString();
             try
             {
-                var response = healthUri.GetJsonFromUrl();
-                if (string.IsNullOrWhiteSpace(response))
-                    throw new WebServiceException($"Expected json but received empty or null reponse from {healthUri}");
-
-                return GetConsulServiceResponses(response).First();
+                var services = GetServices(tagName);
+                foreach (var service in services)
+                {
+                    var definition = service.ServiceName.Split(' ');
+                    if (definition.Length != 2)
+                    {
+                        continue;
+                    }
+                    if (version.Equals(definition[1]))
+                    {
+                        var healthUri = ConsulUris.GetService(service.ServiceName, tagName);
+                        var response = healthUri.GetJsonFromUrl();
+                        if (string.IsNullOrWhiteSpace(response))
+                        {
+                            throw new WebServiceException($"Expected json but received empty or null reponse from {healthUri}");
+                        }
+                        var items = GetHealthyConsulServiceResponses(response);
+                        passingResponses.AddRange(items);
+                    }
+                }
             }
             catch (Exception e)
             {
-                var message = $"No healthy services are currently registered to process the request of type '{tagName}'";
-                LogManager.GetLogger(typeof(ConsulClient)).Error(message, e);
-                throw new GatewayServiceDiscoveryException(message, e);
+                LogManager.GetLogger(typeof(ConsulClient)).Error(e.Message, e);
             }
+            if (passingResponses.Count > 0)
+            {
+                return passingResponses.OrderBy(x => Guid.NewGuid().GetHashCode()).First();
+            }
+            var message = $"No healthy services are currently registered to process the request of type '{tagName}'";
+            throw new GatewayServiceDiscoveryException(message);
         }
 
         /// <summary>
@@ -159,31 +190,47 @@ namespace ServiceStack.Discovery.Consul
                     HealthcheckValidator.ValidateAndThrow(consulCheck);
 
                     var registerUrl = consulCheck.ToPutUrl();
-                    ConsulUris.LocalAgent.CombineWith(registerUrl).PutJsonToUrl(
-                        consulCheck,
-                        null,
-                        response =>
-                        {
-                            if (response.IsErrorResponse())
+                    using (var config = JsConfig.BeginScope())
+                    {
+                        InitJSConfig(config);
+                        ConsulUris.LocalAgent.CombineWith(registerUrl).PutJsonToUrl(
+                            consulCheck,
+                            null,
+                            response =>
                             {
-                                logger.Error(
-                                    $"Could not register health check ${check.Id} with Consul. {response.StatusDescription}");
-                            }
-                            else
-                            {
-                                logger.Info($"Registered health check with Consul `{check.Id}`");
-                            }
-                        });
+                                if (response.IsErrorResponse())
+                                {
+                                    logger.Error($"Could not register health check ${check.Id} with Consul. {response.StatusDescription}");
+                                }
+                                else
+                                {
+                                    logger.Info($"Registered health check with Consul `{check.Id}`");
+                                }
+                            });
+                    }
                 }
                 catch (Exception ex)
                 {
                     logger.Error("Failed to register health check", ex);
                     throw new GatewayServiceDiscoveryException($"Could not register service health check {check.Id}", ex);
                 }
+
             }
         }
 
+        private static void InitJSConfig(JsConfigScope config)
+        {
+            config.EmitCamelCaseNames = false;
+            config.IncludeNullValues = false;
+        }
+
         private static ConsulServiceResponse[] GetConsulServiceResponses(string response)
+        {
+            return response.FromJson<ConsulServiceResponse[]>();
+            //      return health.Select(ConsulServiceResponse.Create).ToArray();
+        }
+
+        private static ConsulServiceResponse[] GetHealthyConsulServiceResponses(string response)
         {
             var health = response.FromJson<ConsulHealthResponse[]>();
             return health.Select(ConsulServiceResponse.Create).ToArray();

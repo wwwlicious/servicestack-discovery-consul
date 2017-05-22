@@ -4,6 +4,7 @@
 
 namespace ServiceStack.Discovery.Consul
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -16,6 +17,10 @@ namespace ServiceStack.Discovery.Consul
         /// </summary>
         public const string GlobalServiceName = "servicestack";
 
+        public string ServiceName { get; set; }
+
+        public string ServiceId { get; set; } = null;
+
         private readonly List<string> customTags = new List<string>();
 
         private readonly List<ConsulRegisterCheck> serviceChecks = new List<ConsulRegisterCheck>();
@@ -24,13 +29,14 @@ namespace ServiceStack.Discovery.Consul
 
         private HostHealthCheck healthCheck;
 
-        private DefaultGatewayDelegate defaultGateway = baseUri => new JsonServiceClient(baseUri);
+        private DefaultGatewayDelegate defaultGateway = service => new JsonServiceClient(service?.Address);
 
         /// <summary>
         /// Set to false to exclude adding the default health checks on service registration
         /// </summary>
         public bool IncludeDefaultServiceHealth { get; set; } = true;
-        
+
+
         /// <summary>
         /// Add custom service tags to your service registration
         /// </summary>

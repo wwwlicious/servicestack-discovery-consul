@@ -8,6 +8,7 @@ namespace ServiceStack.Discovery.Consul
 
     using ServiceStack;
     using ServiceStack.Web;
+    using Text;
 
     /// <summary>
     /// Enables remote service calls by dynamically looking up remote service url
@@ -26,30 +27,36 @@ namespace ServiceStack.Discovery.Consul
             Settings = new ConsulFeatureSettings();
             settings?.Invoke(Settings);
         }
-        
+
         public void Register(IAppHost appHost)
         {
+            // register callbacks
+            appHost.OnDisposeCallbacks.Add(UnRegisterService);
+            appHost.AfterInitCallbacks.Add(RegisterService);
+
             // HACK: not great but unsure how to improve
             // throws exception if WebHostUrl isn't set as this is how we get endpoint url:port
-            if (appHost.Config?.WebHostUrl == null)
-                throw new ApplicationException("appHost.Config.WebHostUrl must be set to use the Consul plugin, this is so consul will know the full external http://url:port for the service");
+            if (appHost.Config?.WebHostUrl != null)
+            {
 
-            // register callbacks
-            appHost.AfterInitCallbacks.Add(RegisterService);
-            appHost.OnDisposeCallbacks.Add(UnRegisterService);
 
-            appHost.RegisterService<HealthCheckService>();
-            appHost.RegisterService<DiscoveryService>();
+                appHost.RegisterService<HealthCheckService>();
+                appHost.RegisterService<DiscoveryService>();
 
-            // register plugin link
-            appHost.GetPlugin<MetadataFeature>()?.AddPluginLink(ConsulUris.LocalAgent.CombineWith("ui"), "Consul Agent WebUI");
+                // register plugin link
+                appHost.GetPlugin<MetadataFeature>()?.AddPluginLink(ConsulUris.LocalAgent.CombineWith("ui"), "Consul Agent WebUI");
+            }
+
         }
+
 
         private void RegisterService(IAppHost host)
         {
             ServiceDiscovery = Settings.GetDiscoveryClient() ?? new ConsulDiscovery();
-            ServiceDiscovery.Register(host);
-
+            if (host.Config?.WebHostUrl != null)
+            {
+                ServiceDiscovery.Register(host);
+            }
             // register servicestack discovery services
             host.Register(ServiceDiscovery);
             host.GetContainer()
@@ -65,7 +72,7 @@ namespace ServiceStack.Discovery.Consul
 
     public delegate HealthCheck HealthCheckDelegate(IAppHost appHost);
 
-    public delegate IServiceGateway DefaultGatewayDelegate(string baseUri);
+    public delegate IServiceGateway DefaultGatewayDelegate(ConsulService service);
 
     public delegate void ConsulSettings(ConsulFeatureSettings settings);
 }
