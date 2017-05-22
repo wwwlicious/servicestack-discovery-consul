@@ -3,75 +3,75 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace ServiceStack.Discovery.Consul
 {
-  using System;
-  using System.Collections.Generic;
-
-  /// <summary>
-  /// Interface used for service discovery
-  /// </summary>
-  /// <typeparam name="TServiceModel">The DTO for service information</typeparam>
-  /// <typeparam name="TServiceRegistration">The DTO for the AppHost registration</typeparam>
-  public interface IServiceDiscovery<out TServiceModel, out TServiceRegistration> where TServiceModel : class where TServiceRegistration : class
-  {
-    /// <summary>
-    /// Holds the current service registration
-    /// </summary>
-    TServiceRegistration Registration { get; }
+    using System;
+    using System.Collections.Generic;
 
     /// <summary>
-    /// Registers the service for discovery
+    /// Interface used for service discovery
     /// </summary>
-    /// <param name="host"></param>
-    void Register(IAppHost host);
+    /// <typeparam name="TServiceModel">The DTO for service information</typeparam>
+    /// <typeparam name="TServiceRegistration">The DTO for the AppHost registration</typeparam>
+    public interface IServiceDiscovery<out TServiceModel, out TServiceRegistration> where TServiceModel : class where TServiceRegistration : class
+    {
+        /// <summary>
+        /// Holds the current service registration
+        /// </summary>
+        TServiceRegistration Registration { get; }
 
-    /// <summary>
-    /// Unregisters the service from discovery
-    /// </summary>
-    /// <param name="host">the apphost</param>
-    void Unregister(IAppHost host);
+        /// <summary>
+        /// Registers the service for discovery
+        /// </summary>
+        /// <param name="host"></param>
+        void Register(IAppHost host);
 
-    /// <summary>
-    /// Returns a list of available services
-    /// </summary>
-    /// <param name="serviceName">the service name</param>
-    /// <returns>the matching services</returns>
-    TServiceModel[] GetServices(string serviceName);
+        /// <summary>
+        /// Unregisters the service from discovery
+        /// </summary>
+        /// <param name="host">the apphost</param>
+        void Unregister(IAppHost host);
 
-    /// <summary>
-    /// Returns a single service for a dto
-    /// </summary>
-    /// <param name="serviceName">the service name</param>
-    /// <param name="dtoName">the request dto name</param>
-    /// <returns>the service dto</returns>
-    TServiceModel GetService(string serviceName, string dtoName, Version minVersion = null);
+        /// <summary>
+        /// Returns a list of available services
+        /// </summary>
+        /// <param name="serviceName">the service name</param>
+        /// <returns>the matching services</returns>
+        TServiceModel[] GetServices(string serviceName);
 
-    /// <summary>
-    /// Inspects the IAppHost and returns a list of strings that will represent the RequestDTO types
-    /// These strings are used by <see cref="ResolveBaseUri(object)"/> to find the AppHost's BaseUri
-    /// </summary>
-    /// <param name="host">the apphost</param>
-    /// <returns>list of types to register for discovery</returns>
-    HashSet<Type> GetRequestTypes(IAppHost host);
+        /// <summary>
+        /// Returns a single service for a dto
+        /// </summary>
+        /// <param name="serviceName">the service name</param>
+        /// <param name="dtoName">the request dto name</param>
+        /// <returns>the service dto</returns>
+        TServiceModel GetService(string serviceName, string dtoName, Version minVersion = null);
 
-    /// <summary>
-    /// Takes a dto object and returns the correct BaserUri for the gateway to send it to
-    /// </summary>
-    /// <param name="dto">the request dto</param>
-    /// <returns>the BaseUri that will serve this request</returns>
-    string ResolveBaseUri(object dto);
+        /// <summary>
+        /// Inspects the IAppHost and returns a list of strings that will represent the RequestDTO types
+        /// These strings are used by <see cref="ResolveBaseUri(object)"/> to find the AppHost's BaseUri
+        /// </summary>
+        /// <param name="host">the apphost</param>
+        /// <returns>list of types to register for discovery</returns>
+        HashSet<Type> GetRequestTypes(IAppHost host);
 
-    /// <summary>
-    /// Takes a dto type and returns the correct BaseUri for the gateway to send it to
-    /// </summary>
-    /// <param name="dtoType">The request dto type</param>
-    /// <returns>the BaserUri that will serve this request</returns>
-    string ResolveBaseUri(Type dtoType);
+        /// <summary>
+        /// Takes a dto object and returns the correct BaserUri for the gateway to send it to
+        /// </summary>
+        /// <param name="dto">the request dto</param>
+        /// <returns>the BaseUri that will serve this request</returns>
+        string ResolveBaseUri(object dto);
+
+        /// <summary>
+        /// Takes a dto type and returns the correct BaseUri for the gateway to send it to
+        /// </summary>
+        /// <param name="dtoType">The request dto type</param>
+        /// <returns>the BaserUri that will serve this request</returns>
+        string ResolveBaseUri(Type dtoType);
 
 
-    ConsulService ResolveService(object dto);
+        ConsulService ResolveService(object dto);
 
 
-    ConsulService ResolveService(Type dtoType);
+        ConsulService ResolveService(Type dtoType);
 
-  }
+    }
 }
