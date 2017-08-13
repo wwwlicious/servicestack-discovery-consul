@@ -11,6 +11,7 @@ namespace ServiceStack.Discovery.Consul
 
         // return current registration and health info
         public IServiceDiscovery<ConsulService, ServiceRegistration> Discovery { get; set; }
+        public ConsulFeatureSettings ConsulFeatureSettings { get; set; }
 
         public object Any(ServiceRegistration registration)
         {
@@ -22,7 +23,7 @@ namespace ServiceStack.Discovery.Consul
         /// </summary>
         public object Any(GetServices request)
         {
-            var allServices = Discovery.GetServices(Discovery.Registration.Name);
+            var allServices = Discovery.GetServices(ConsulFeatureSettings.ConsulRemoteAddress, Discovery.Registration.Name);
             return new GetServicesResponse { Services = allServices };
         }
 
@@ -35,7 +36,7 @@ namespace ServiceStack.Discovery.Consul
             GetServiceValidator.ValidateAndThrow(request);
             try
             {
-                var response = Discovery.GetService(Discovery.Registration.Name, request.DtoName);
+                var response = Discovery.GetService(ConsulFeatureSettings.ConsulRemoteAddress, Discovery.Registration.Name, request.DtoName);
                 return new GetServiceResponse(response);
             }
             catch (WebServiceException e)

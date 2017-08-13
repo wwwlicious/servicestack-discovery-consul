@@ -13,6 +13,8 @@ namespace ServiceStack.Discovery.Consul
 
         private readonly IServiceDiscovery<ConsulService, ServiceRegistration> discoveryClient;
 
+        public ConsulFeatureSettings ConsulFeatureSettings { get; set; }
+
         private readonly ConcurrentDictionary<string, HttpCacheEntry> sharedCache = new ConcurrentDictionary<string, HttpCacheEntry>();
 
         public HashSet<Type> LocalTypes { get; set; }
@@ -32,7 +34,7 @@ namespace ServiceStack.Discovery.Consul
             if (LocalTypes.Contains(requestType))
                 return localGateway;
 
-            var baseUri = discoveryClient.ResolveBaseUri(requestType);
+            var baseUri = discoveryClient.ResolveBaseUri(ConsulFeatureSettings.ConsulRemoteAddress, requestType);
             if (string.IsNullOrWhiteSpace(baseUri))
             {
                 throw new WebServiceException($"Could not resolve the uri in consul for external requestType {requestType.Name}");

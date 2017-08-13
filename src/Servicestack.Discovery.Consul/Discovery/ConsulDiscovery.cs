@@ -28,7 +28,8 @@ namespace ServiceStack.Discovery.Consul
             // get endpoint http://url:port/path and version
             var baseUrl = appHost.Config.WebHostUrl.CombineWith(appHost.Config.HandlerFactoryPath);
             var dtoTypes = GetRequestTypes(appHost);
-            var customTags = appHost.GetPlugin<ConsulFeature>().Settings.GetCustomTags();
+            var consulFeatureSettings = appHost.GetPlugin<ConsulFeature>().Settings;
+            var customTags = consulFeatureSettings.GetCustomTags();
 
             // construct registration 
             var registration = new ServiceRegistration
@@ -47,9 +48,10 @@ namespace ServiceStack.Discovery.Consul
             registration.Tags = tags.ToArray();
             
             // register the service and healthchecks with consul
-            ConsulClient.RegisterService(registration);
+
+            ConsulClient.RegisterService(consulFeatureSettings,registration);
             var heathChecks = CreateHealthChecks(registration);
-            ConsulClient.RegisterHealthChecks(heathChecks);
+            ConsulClient.RegisterHealthChecks(consulFeatureSettings.ConsulRemoteAddress, heathChecks);
             registration.HealthChecks = heathChecks;
 
             // TODO Generate warnings if dto's have [Restrict(RequestAttributes.Secure)] 
@@ -73,19 +75,19 @@ namespace ServiceStack.Discovery.Consul
         {
             if (Registration == null) return;
 
-            ConsulClient.UnregisterService(Registration.Id);
+            ConsulClient.UnregisterService(appHost.GetPlugin<ConsulFeature>().Settings.ConsulRemoteAddress,Registration.Id);
             Registration = null;
         }
 
-        public ConsulService[] GetServices(string serviceName)
+        public ConsulService[] GetServices(string consulAddress, string serviceName)
         {
-            var response = ConsulClient.GetServices(serviceName);
+            var response = ConsulClient.GetServices(consulAddress, serviceName);
             return response.Select(x => new ConsulService(x)).ToArray();
         }
 
-        public ConsulService GetService(string serviceName, string dtoName)
+        public ConsulService GetService(string consulAddress, string serviceName, string dtoName)
         {
-            var response = ConsulClient.GetService(serviceName, dtoName);
+            var response = ConsulClient.GetService(consulAddress, serviceName, dtoName);
             return new ConsulService(response);
         }
 
@@ -103,17 +105,17 @@ namespace ServiceStack.Discovery.Consul
                     .ToHashSet();
         }
 
-        public string ResolveBaseUri(object dto)
+        public string ResolveBaseUri(string consulRemoteAddress,object dto)
         {
-            return ResolveBaseUri(dto.GetType());
+            return ResolveBaseUri(consulRemoteAddress, dto.GetType());
         }
 
-        public string ResolveBaseUri(Type dtoType)
+        public string ResolveBaseUri(string consulRemoteAddress, Type dtoType)
         {
             // handles all tag matching, healthy and lowest round trip time (rtt)
             // throws GatewayServiceDiscoveryException back to the Gateway 
             // to allow retry/exception handling at call site
-            return GetService(Registration.Name, dtoType.Name)?.Address;
+            return GetService(consulRemoteAddress, Registration.Name, dtoType.Name)?.Address;
         }
 
         private ServiceHealthCheck[] CreateHealthChecks(ServiceRegistration registration)

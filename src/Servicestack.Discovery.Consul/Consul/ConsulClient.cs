@@ -23,7 +23,7 @@ namespace ServiceStack.Discovery.Consul
         /// Registers the servicestack apphost with the local consul agent
         /// </summary>
         /// <exception cref="GatewayServiceDiscoveryException">throws exception if registration was not successful</exception>
-        public static void RegisterService(ServiceRegistration registration)
+        public static void RegisterService(ConsulFeatureSettings consulFeatureSettings, ServiceRegistration registration)
         {
             var consulServiceRegistration = new ConsulServiceRegistration(registration.Id, registration.Name)
                                    {
@@ -34,7 +34,7 @@ namespace ServiceStack.Discovery.Consul
 
             ServiceValidator.ValidateAndThrow(consulServiceRegistration);
 
-            var registrationUrl = ConsulUris.LocalAgent.CombineWith(consulServiceRegistration.ToPutUrl());
+            var registrationUrl = consulFeatureSettings.ConsulRemoteAddress .CombineWith(consulServiceRegistration.ToPutUrl());
             registrationUrl.PostJsonToUrl(consulServiceRegistration, null,
                 response =>
                 {
@@ -49,9 +49,9 @@ namespace ServiceStack.Discovery.Consul
                     {
                         logger.Info($"Registered service with Consul {consulServiceRegistration}");
                         AppDomain.CurrentDomain.ProcessExit +=
-                            (sender, args) => UnregisterService(consulServiceRegistration.ID);
+                            (sender, args) => UnregisterService(consulFeatureSettings.ConsulRemoteAddress,consulServiceRegistration.ID);
                         AppDomain.CurrentDomain.UnhandledException +=
-                            (sender, args) => UnregisterService(consulServiceRegistration.ID);
+                            (sender, args) => UnregisterService(consulFeatureSettings.ConsulRemoteAddress,consulServiceRegistration.ID);
                     }
                 });
         }
@@ -59,11 +59,12 @@ namespace ServiceStack.Discovery.Consul
         /// <summary>
         /// Removes a service registation (and it's associated health checks) from consul
         /// </summary>
+        /// <param name="consulAddress">the address of the consul server</param>
         /// <param name="serviceId">the id of the service to unregister</param>
         /// <exception cref="GatewayServiceDiscoveryException">throws exception if unregistration was not successful</exception>
-        public static void UnregisterService(string serviceId)
+        public static void UnregisterService(string consulAddress, string serviceId)
         {
-            ConsulUris.DeregisterService(serviceId).GetJsonFromUrl(
+            ConsulUris.DeregisterService(consulAddress,serviceId).GetJsonFromUrl(
                 null,
                 response =>
                     {
@@ -83,17 +84,18 @@ namespace ServiceStack.Discovery.Consul
         /// <summary>
         /// Returns a list of catalog services and tags
         /// </summary>
+        /// <param name="consulAddress">the address of the consul server</param>
         /// <returns>service id's and tags</returns>
         /// <exception cref="GatewayServiceDiscoveryException">throws exception if unable to get services</exception>
-        public static ConsulServiceResponse[] GetServices(string serviceName)
+        public static ConsulServiceResponse[] GetServices(string consulAddress,string serviceName)
         {
             try
             {
-                var response = ConsulUris.GetServices(serviceName).GetJsonFromUrl();
+                var response = ConsulUris.GetServices(consulAddress,serviceName).GetJsonFromUrl();
 
                 if (string.IsNullOrWhiteSpace(response))
                     throw new WebServiceException(
-                        $"Expected json but received empty or null reponse from {ConsulUris.GetServices(serviceName)}");
+                        $"Expected json but received empty or null reponse from {ConsulUris.GetServices(consulAddress,serviceName)}");
 
                 return GetConsulServiceResponses(response);
             }
@@ -108,17 +110,18 @@ namespace ServiceStack.Discovery.Consul
         /// <summary>
         /// Gets the service 
         /// </summary>
+        /// <param name="address">The global service name for servicestack services</param>
         /// <param name="serviceName">The global service name for servicestack services</param>
         /// <param name="tagName">the tagName to find the service for</param>
         /// <returns>The service for the tagName</returns>
         /// <exception cref="GatewayServiceDiscoveryException">throws exception if no service available for dto</exception>
-        public static ConsulServiceResponse GetService(string serviceName, string tagName)
+        public static ConsulServiceResponse GetService(string consulAddress,string serviceName, string tagName)
         {
             // todo add flag to allow warning services to be included in results
 
             // `passing` filters out any services with critical or warning health states
             // `near=_agent` sorts results by shortest round trip time
-            var healthUri = ConsulUris.GetService(serviceName, tagName);
+            var healthUri = ConsulUris.GetService(consulAddress, serviceName, tagName);
             try
             {
                 var response = healthUri.GetJsonFromUrl();
@@ -138,9 +141,10 @@ namespace ServiceStack.Discovery.Consul
         /// <summary>
         /// Registers service health checks with consul
         /// </summary>
+        /// <param name="consulAddress">the address of the consul server</param>
         /// <param name="healthChecks">the health checks to register</param>
         /// <exception cref="GatewayServiceDiscoveryException">throws exception if unable to register health checks</exception>
-        public static void RegisterHealthChecks(params ServiceHealthCheck[] healthChecks)
+        public static void RegisterHealthChecks(string consulAddress, params ServiceHealthCheck[] healthChecks)
         {
             var logger = LogManager.GetLogger(typeof(ConsulClient));
 
@@ -159,7 +163,7 @@ namespace ServiceStack.Discovery.Consul
                     HealthcheckValidator.ValidateAndThrow(consulCheck);
 
                     var registerUrl = consulCheck.ToPutUrl();
-                    ConsulUris.LocalAgent.CombineWith(registerUrl).PutJsonToUrl(
+                    consulAddress.CombineWith(registerUrl).PutJsonToUrl(
                         consulCheck,
                         null,
                         response =>

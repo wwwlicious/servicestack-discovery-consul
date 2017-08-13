@@ -42,7 +42,7 @@ namespace ServiceStack.Discovery.Consul
             appHost.RegisterService<DiscoveryService>();
 
             // register plugin link
-            appHost.GetPlugin<MetadataFeature>()?.AddPluginLink(ConsulUris.LocalAgent.CombineWith("ui"), "Consul Agent WebUI");
+            appHost.GetPlugin<MetadataFeature>()?.AddPluginLink(Settings.ConsulRemoteAddress.CombineWith("ui"), "Consul Agent WebUI");
         }
 
         private void RegisterService(IAppHost host)

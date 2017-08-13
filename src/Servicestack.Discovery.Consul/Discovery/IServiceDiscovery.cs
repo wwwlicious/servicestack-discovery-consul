@@ -33,17 +33,19 @@ namespace ServiceStack.Discovery.Consul
         /// <summary>
         /// Returns a list of available services
         /// </summary>
+        /// <param name="consulAddress">the address of the consul server</param>
         /// <param name="serviceName">the service name</param>
         /// <returns>the matching services</returns>
-        TServiceModel[] GetServices(string serviceName);
+        TServiceModel[] GetServices(string consulAddress, string serviceName);
 
         /// <summary>
         /// Returns a single service for a dto
         /// </summary>
+        /// <param name="consulAddress">the address of the consul server</param>
         /// <param name="serviceName">the service name</param>
         /// <param name="dtoName">the request dto name</param>
         /// <returns>the service dto</returns>
-        TServiceModel GetService(string serviceName, string dtoName);
+        TServiceModel GetService(string consulAddress, string serviceName, string dtoName);
 
         /// <summary>
         /// Inspects the IAppHost and returns a list of strings that will represent the RequestDTO types
@@ -56,15 +58,17 @@ namespace ServiceStack.Discovery.Consul
         /// <summary>
         /// Takes a dto object and returns the correct BaserUri for the gateway to send it to
         /// </summary>
+        /// <param name="consulAddress">the address of the consul server</param>
         /// <param name="dto">the request dto</param>
         /// <returns>the BaseUri that will serve this request</returns>
-        string ResolveBaseUri(object dto);
+        string ResolveBaseUri(string consulAddress,object dto);
 
         /// <summary>
         /// Takes a dto type and returns the correct BaseUri for the gateway to send it to
         /// </summary>
         /// <param name="dtoType">The request dto type</param>
+        /// <param name="consulRemoteAddress"></param>
         /// <returns>the BaserUri that will serve this request</returns>
-        string ResolveBaseUri(Type dtoType);
+        string ResolveBaseUri(string consulRemoteAddress, Type dtoType);
     }
 }

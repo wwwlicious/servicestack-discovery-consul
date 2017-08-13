@@ -25,6 +25,7 @@ namespace ServiceStack.Discovery.Consul
         private HostHealthCheck healthCheck;
 
         private DefaultGatewayDelegate defaultGateway = baseUri => new JsonServiceClient(baseUri);
+        public string ConsulRemoteAddress { get; set; }
 
         /// <summary>
         /// Set to false to exclude adding the default health checks on service registration
