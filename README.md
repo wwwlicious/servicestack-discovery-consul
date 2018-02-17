@@ -1,5 +1,5 @@
 # ServiceStack.Discovery.Consul 
-[![Build status](https://ci.appveyor.com/api/projects/status/55830emag9ksyasf/branch/master?svg=true)](https://ci.appveyor.com/project/macleanelectrical/servicestack-discovery-consul)
+[![Build status](https://ci.appveyor.com/api/projects/status/55830emag9ksyasf/branch/master?svg=true)](https://ci.appveyor.com/project/wwwlicious/servicestack-discovery-consul)
 [![NuGet version](https://badge.fury.io/nu/ServiceStack.Discovery.Consul.svg)](https://badge.fury.io/nu/ServiceStack.Discovery.Consul)
 
 A plugin for [ServiceStack](https://servicestack.net/) that provides 
