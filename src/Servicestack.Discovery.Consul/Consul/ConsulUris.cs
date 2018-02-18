@@ -20,7 +20,7 @@ namespace ServiceStack.Discovery.Consul
         /// <summary>
         /// Uri for retrieving a list of servicestack services 
         /// </summary>
-        /// <remarks><see cref="https://www.consul.io/docs/agent/http/catalog.html#catalog_services"/></remarks>
+        /// <remarks>for more info, see https://www.consul.io/docs/agent/http/catalog.html#catalog_services</remarks>
         public static readonly Func<string, string> GetServices = (service) => $"{LocalAgent}/v1/health/service/{service}?near=_agent&passing";
 
         /// <summary>

@@ -1,0 +1,8 @@
+[*]
+indent_size=4
+max_line_length=100
+
+csharp_new_line_within_query_expression_clauses=true
+
+resharper_csharp_brace_style=next_line
+resharper_csharp_blank_lines_around_invocable=2

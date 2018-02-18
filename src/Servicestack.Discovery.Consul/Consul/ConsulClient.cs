@@ -35,7 +35,7 @@ namespace ServiceStack.Discovery.Consul
             ServiceValidator.ValidateAndThrow(consulServiceRegistration);
 
             var registrationUrl = ConsulUris.LocalAgent.CombineWith(consulServiceRegistration.ToPutUrl());
-            registrationUrl.PostJsonToUrl(consulServiceRegistration, null,
+            registrationUrl.PutJsonToUrl(consulServiceRegistration, null,
                 response =>
                 {
                     var logger = LogManager.GetLogger(typeof(ConsulClient));

@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="ServiceStack" Version="4.5.8" />
+    <ProjectReference Include="..\..\Servicestack.Discovery.Consul\ServiceStack.Discovery.Consul.csproj" />
+  </ItemGroup>
+</Project>

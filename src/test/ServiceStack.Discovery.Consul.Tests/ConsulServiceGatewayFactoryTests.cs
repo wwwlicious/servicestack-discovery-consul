@@ -17,14 +17,14 @@ namespace ServiceStack.Discovery.Consul.Tests
         public void Ctor_Requires_DefaultGatewayDelegate()
         {
             Action action = () => new ConsulServiceGatewayFactory(null, new TestServiceDiscovery());
-            action.ShouldThrow<ArgumentNullException>().And.ParamName.Should().Be("defaultGateway");
+            action.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("defaultGateway");
         }
 
         [Fact]
         public void Ctor_Requires_DefaultDiscovery()
         {
             Action action = () => new ConsulServiceGatewayFactory(uri => new JsonServiceClient(uri), null);
-            action.ShouldThrow<ArgumentNullException>().And.ParamName.Should().Be("discoveryClient");
+            action.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("discoveryClient");
         }
 
         [Fact]

@@ -26,7 +26,7 @@ namespace ServiceStack.Discovery.Consul
             Settings = new ConsulFeatureSettings();
             settings?.Invoke(Settings);
         }
-        
+      
         public void Register(IAppHost appHost)
         {
             // HACK: not great but unsure how to improve

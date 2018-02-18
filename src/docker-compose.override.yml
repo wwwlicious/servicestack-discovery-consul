@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  testserviceb:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "5000"
+networks:
+  default:
+    external:
+      name: nat

@@ -34,7 +34,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         {
             Action action = () => new HostHealthCheck(null);
 
-            action.ShouldThrow<ArgumentNullException>().Which.ParamName.Should().Be("healthCheckDelegate");
+            action.Should().Throw<ArgumentNullException>().Which.ParamName.Should().Be("healthCheckDelegate");
         }
 
         [Fact]

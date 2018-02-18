@@ -1,124 +1,52 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A4E5E757-119D-4D86-BFFC-57A425F51A5C}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ServiceStack.Discovery.Consul</RootNamespace>
-    <AssemblyName>ServiceStack.Discovery.Consul</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <Copyright>Copyright © 2017</Copyright>
+    <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
+    <Configurations>Debug;Release</Configurations>
+    <Title>ServiceStack.Configuration.Consul</Title>
+    <Description>ServiceStack plugin that supports service discovery and request uri resolution using Consul</Description>
+    <Authors>Scott Mackay (@wwwlicious)</Authors>
+    <Owners>Scott Mackay (@wwwlicious)</Owners>
+    <Copyright>Copyright (c) wwwlicious 2016 - Present</Copyright>
+    <RequireLicenseAcceptance>false</RequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <NoWarn>CS1591</NoWarn>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <PackageId>ServiceStack.Discovery.Consul</PackageId>
+    <Version>$(Version)</Version>
+    <PackageOutputPath>$(PackageOutputPath)</PackageOutputPath>
+    <PackageLicenseUrl>https://opensource.org/licenses/MPL-2.0</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/wwwlicious/servicestack-discovery-consul</PackageProjectUrl>
+    <PackageIconUrl>https://servicestack.net/img/logo-32.png</PackageIconUrl>
+    <ReleaseNotes>https://github.com/wwwlicious/servicestack-discovery-consul/releases</ReleaseNotes>
+    <PackageTags>servicestack plugin discovery gateway servicediscovery microservices consul</PackageTags>
+    <IncludeSymbols>true</IncludeSymbols>
+    <IncludeSource>true</IncludeSource>
+    <RepositoryUrl>https://github.com/wwwlicious/servicestack-discovery-consul</RepositoryUrl>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <DocumentationFile>bin\Debug\ServiceStack.Discovery.Consul.XML</DocumentationFile>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net452|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;NET452;</DefineConstants>
+    <DocumentationFile>bin\Debug\net452\ServiceStack.Discovery.Consul.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net452|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;NET452</DefineConstants>
+    <DocumentationFile>bin\Release\net452\ServiceStack.Discovery.Consul.xml</DocumentationFile>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="ServiceStack, Version=4.0.58.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ServiceStack.4.0.58\lib\net40\ServiceStack.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ServiceStack.Client, Version=4.0.58.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ServiceStack.Client.4.0.58\lib\net40\ServiceStack.Client.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ServiceStack.Common, Version=4.0.58.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ServiceStack.Common.4.0.58\lib\net40\ServiceStack.Common.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ServiceStack.Interfaces, Version=4.0.0.0, Culture=neutral, PublicKeyToken=e06fbc6124f57c43, processorArchitecture=MSIL">
-      <HintPath>..\packages\ServiceStack.Interfaces.4.0.58\lib\portable-wp80+sl5+net40+win8+wpa81+monotouch+monoandroid+xamarin.ios10\ServiceStack.Interfaces.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ServiceStack.OrmLite, Version=4.0.56.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ServiceStack.OrmLite.4.0.56\lib\net45\ServiceStack.OrmLite.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ServiceStack.Redis, Version=4.0.56.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ServiceStack.Redis.4.0.56\lib\net40\ServiceStack.Redis.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ServiceStack.Server, Version=4.0.56.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ServiceStack.Server.4.0.56\lib\net45\ServiceStack.Server.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ServiceStack.Text, Version=4.0.58.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ServiceStack.Text.4.0.58\lib\net40\ServiceStack.Text.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Web" />
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0;</DefineConstants>
+    <DocumentationFile>bin\Debug\netstandard2.0\ServiceStack.Discovery.Consul.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0</DefineConstants>
+    <DocumentationFile>bin\Release\netstandard2.0\ServiceStack.Discovery.Consul.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='net452'">
+    <PackageReference Include="ServiceStack.Server" Version="[4.5.8, 5)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+    <PackageReference Include="ServiceStack.Server" Version="5.0.*" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Consul\ConsulHealthResponse.cs" />
-    <Compile Include="Discovery\ConsulService.cs" />
-    <Compile Include="Discovery\ConsulServiceId.cs" />
-    <Compile Include="Discovery\TagExtensions.cs" />
-    <Compile Include="Dtos\HealthCheck.cs" />
-    <Compile Include="Dtos\Heartbeat.cs" />
-    <Compile Include="Services\HealthCheckService.cs" />
-    <Compile Include="Dtos\ServiceHealth.cs" />
-    <Compile Include="Discovery\Consul.cs" />
-    <Compile Include="Discovery\ConsulDiscovery.cs" />
-    <Compile Include="ConsulFeature.cs" />
-    <Compile Include="ConsulFeatureSettings.cs" />
-    <Compile Include="Gateway\ConsulServiceGatewayFactory.cs" />
-    <Compile Include="Consul\ConsulRegisterCheck.cs" />
-    <Compile Include="Dtos\GetServiceResponse.cs" />
-    <Compile Include="Dtos\GetServices.cs" />
-    <Compile Include="Dtos\GetServicesResponse.cs" />
-    <Compile Include="Validators\ConsulRegisterCheckValidator.cs" />
-    <Compile Include="Validators\ConsulRegisterServiceValidator.cs" />
-    <Compile Include="Consul\ConsulServiceRegistration.cs" />
-    <Compile Include="Consul\ConsulServiceResponse.cs" />
-    <Compile Include="Consul\ConsulUris.cs" />
-    <Compile Include="Services\DiscoveryService.cs" />
-    <Compile Include="Exceptions\GatewayServiceDiscoveryException.cs" />
-    <Compile Include="TypeExtensions.cs" />
-    <Compile Include="HostHealthCheck.cs" />
-    <Compile Include="Discovery\IServiceDiscovery.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Consul\ConsulClient.cs" />
-    <Compile Include="Dtos\ServiceRegistration.cs" />
-    <Compile Include="Dtos\GetService.cs" />
-    <Compile Include="Validators\GetServiceValidator.cs" />
+    <Reference Include="System.Web" Condition="'$(TargetFramework)' == 'net452'" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-    <None Include="ServiceStack.Discovery.Consul.nuspec">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

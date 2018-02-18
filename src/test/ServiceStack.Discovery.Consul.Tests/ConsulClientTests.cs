@@ -41,10 +41,12 @@ namespace ServiceStack.Discovery.Consul.Tests
             {
                 Action action = () => ConsulClient.GetService("service", "three");
 
-                action.ShouldThrow<GatewayServiceDiscoveryException>()
-                    .WithMessage("No healthy services are currently registered to process the request of type 'three'")
-                    .WithInnerException<WebServiceException>()
-                    .WithInnerMessage("Expected json but received empty or null reponse from http://127.0.0.1:8500/v1/health/service/service?near=_agent&passing&tag=three");
+              action.Should().Throw<GatewayServiceDiscoveryException>()
+                .WithMessage(
+                  "No healthy services are currently registered to process the request of type 'three'")
+                .WithInnerException<WebServiceException>()
+                .WithMessage(
+                  "Expected json but received empty or null reponse from http://127.0.0.1:8500/v1/health/service/service?near=_agent&passing&tag=three");
             }
         }
 
@@ -55,9 +57,9 @@ namespace ServiceStack.Discovery.Consul.Tests
             {
                 Action action = () => ConsulClient.GetServices("servicestack");
 
-                var ex = action.ShouldThrow<GatewayServiceDiscoveryException>();
+                var ex = action.Should().Throw<GatewayServiceDiscoveryException>();
                 ex.WithMessage("Unable to retrieve services from Consul");
-                ex.WithInnerException<Exception>().WithInnerMessage("unexpected");
+                ex.WithInnerException<Exception>().WithMessage("unexpected");
             }
         }
 
@@ -68,7 +70,7 @@ namespace ServiceStack.Discovery.Consul.Tests
             {
                 Action action = () => ConsulClient.GetService("ServiceStack", "three");
 
-                action.ShouldThrow<GatewayServiceDiscoveryException>().WithMessage("No healthy services are currently registered to process the request of type 'three'");
+                action.Should().Throw<GatewayServiceDiscoveryException>().WithMessage("No healthy services are currently registered to process the request of type 'three'");
             }
         }
 

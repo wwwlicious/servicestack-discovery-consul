@@ -26,7 +26,7 @@ namespace ServiceStack.Discovery.Consul.Tests
         {
             Action action = () => new ConsulFeature().Register(new BasicAppHost());
 
-            action.ShouldThrow<ApplicationException>().Which.Message.Should().Be("appHost.Config.WebHostUrl must be set to use the Consul plugin, this is so consul will know the full external http://url:port for the service");
+            action.Should().Throw<ApplicationException>().Which.Message.Should().Be("appHost.Config.WebHostUrl must be set to use the Consul plugin, this is so consul will know the full external http://url:port for the service");
         }
 
         [Fact]

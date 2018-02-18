@@ -4,6 +4,7 @@
 namespace ServiceStack.Discovery.Consul
 {
     using ServiceStack.FluentValidation;
+    using ServiceStack.Logging;
 
     public class DiscoveryService : Service
     {
@@ -33,16 +34,8 @@ namespace ServiceStack.Discovery.Consul
         {
             // we can't rely on AppHost having validation plugin configured so just manually check
             GetServiceValidator.ValidateAndThrow(request);
-            try
-            {
-                var response = Discovery.GetService(Discovery.Registration.Name, request.DtoName);
-                return new GetServiceResponse(response);
-            }
-            catch (WebServiceException e)
-            {
-
-                throw;
-            }
+            var response = Discovery.GetService(Discovery.Registration.Name, request.DtoName);
+            return new GetServiceResponse(response);
         }
     }
 }

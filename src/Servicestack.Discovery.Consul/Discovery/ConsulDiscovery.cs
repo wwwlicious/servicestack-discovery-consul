@@ -45,13 +45,21 @@ namespace ServiceStack.Discovery.Consul
             tags.AddRange(dtoTypes.Select(x => x.Name));
             tags.AddRange(customTags);
             registration.Tags = tags.ToArray();
-            
-            // register the service and healthchecks with consul
-            ConsulClient.RegisterService(registration);
-            var heathChecks = CreateHealthChecks(registration);
-            ConsulClient.RegisterHealthChecks(heathChecks);
-            registration.HealthChecks = heathChecks;
 
+            try
+            {
+                // register the service and healthchecks with consul
+                ConsulClient.RegisterService(registration);
+                var heathChecks = CreateHealthChecks(registration);
+                ConsulClient.RegisterHealthChecks(heathChecks);
+                registration.HealthChecks = heathChecks;
+
+            }
+            catch (Exception e)
+            {
+                throw new GatewayServiceDiscoveryException($"Failed to register the service with consul agent {ConsulUris.LocalAgent}", e);
+            }
+            
             // TODO Generate warnings if dto's have [Restrict(RequestAttributes.Secure)] 
             // but are being registered without an https:// baseUri
 
