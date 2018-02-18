@@ -3,7 +3,7 @@
     <Copyright>Copyright © 2017</Copyright>
     <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
     <Configurations>Debug;Release</Configurations>
-    <Title>ServiceStack.Configuration.Consul</Title>
+    <Title>ServiceStack.Discovery.Consul</Title>
     <Description>ServiceStack plugin that supports service discovery and request uri resolution using Consul</Description>
     <Authors>Scott Mackay (@wwwlicious)</Authors>
     <Owners>Scott Mackay (@wwwlicious)</Owners>
