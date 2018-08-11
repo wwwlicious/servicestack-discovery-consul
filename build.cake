@@ -190,14 +190,15 @@ Task("Publish-Nuget-Packages")
 
     nugetSourceUrl.ThrowIfNull(nameof(nugetSourceUrl));
     nugetApiKey.ThrowIfNull(nameof(nugetApiKey));
-    var nupkgFiles = GetFiles(nugetPackageDir.Path + "/**/*.nupkg");
+    var nupkgFiles = GetFiles(nugetPackageDir.Path + "/**/*.symbols.nupkg");
 
     foreach(var nupkgFile in nupkgFiles)
     {
         // Push the package.
         NuGetPush(nupkgFile, new NuGetPushSettings {
             Source = nugetSourceUrl,
-            ApiKey = nugetApiKey
+            ApiKey = nugetApiKey,
+
         });
     }
 });
