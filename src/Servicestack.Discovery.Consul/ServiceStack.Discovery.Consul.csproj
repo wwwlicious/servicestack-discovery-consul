@@ -40,10 +40,7 @@
     <DocumentationFile>bin\Release\netstandard2.0\ServiceStack.Discovery.Consul.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ServiceStack.Server" Version="5.*" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.1.1" />
+    <PackageReference Include="ServiceStack.Server" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Web" Condition="'$(TargetFramework)' == 'net452'" />
