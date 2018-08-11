@@ -57,8 +57,13 @@ var projects = ParseSolution(solutionFile).GetProjects().Select(x => ParseProjec
 
 Setup(ctx =>
 {
-   // Executed BEFORE the first task.
-   Information("Running tasks...");
+    // Executed BEFORE the first task.
+    Information("Running tasks...");
+
+    if(isMasterBranch && (ctx.Log.Verbosity != Verbosity.Diagnostic)) {
+        Information("Increasing verbosity to diagnostic.");
+        ctx.Log.Verbosity = Verbosity.Diagnostic;
+    }
 });
 
 Teardown(ctx =>
