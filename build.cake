@@ -190,7 +190,7 @@ Task("Publish-Nuget-Packages")
 
     nugetSourceUrl.ThrowIfNull(nameof(nugetSourceUrl));
     nugetApiKey.ThrowIfNull(nameof(nugetApiKey));
-    var nupkgFiles = GetFiles(nugetPackageDir.Path + "/**/*.symbols.nupkg");
+    var nupkgFiles = GetFiles(nugetPackageDir.Path + "**/*.nupkg;-:**/*.symbols.nupkg");
 
     foreach(var nupkgFile in nupkgFiles)
     {
