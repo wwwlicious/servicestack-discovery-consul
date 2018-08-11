@@ -57,8 +57,13 @@ var projects = ParseSolution(solutionFile).GetProjects().Select(x => ParseProjec
 
 Setup(ctx =>
 {
-   // Executed BEFORE the first task.
-   Information("Running tasks...");
+    // Executed BEFORE the first task.
+    Information("Running tasks...");
+
+    if(isMasterBranch && (ctx.Log.Verbosity != Verbosity.Diagnostic)) {
+        Information("Increasing verbosity to diagnostic.");
+        ctx.Log.Verbosity = Verbosity.Diagnostic;
+    }
 });
 
 Teardown(ctx =>
@@ -90,7 +95,8 @@ Task("Build")
             .WithProperty("resultsAsErrors", "3884")
             .WithProperty("CodeContractsRunCodeAnalysis", "true")
             .WithProperty("RunCodeAnalysis", "false")
-            .WithProperty("VersionNumber", semVersion)
+            .WithProperty("Version", semVersion)
+            .WithProperty("PackageVersion", gitVersionResults.MajorMinorPatch)
             .WithProperty("PackageOutputPath", MakeAbsolute(nugetPackageDir).FullPath)
             .UseToolVersion(MSBuildToolVersion.VS2017)
             .SetNodeReuse(false);
