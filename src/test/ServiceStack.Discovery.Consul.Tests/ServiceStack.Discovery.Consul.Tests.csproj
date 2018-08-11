@@ -3,7 +3,8 @@
     <TargetFramework>net462</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Fakeiteasy" Version="4.0.0" />
+    <PackageReference Include="FakeItEasy" Version="4.8.0" />
+    <PackageReference Include="FakeItEasy.Analyzer.CSharp" Version="4.8.0" />
     <PackageReference Include="FluentAssertions" Version="5.1.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
     <PackageReference Include="xunit" Version="2.3.1" />
