@@ -13,6 +13,7 @@
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <PackageId>ServiceStack.Discovery.Consul</PackageId>
     <Version>$(Version)</Version>
+    <PackageVersion>$(PackageVersion)</PackageVersion>
     <PackageOutputPath>$(PackageOutputPath)</PackageOutputPath>
     <PackageLicenseUrl>https://opensource.org/licenses/MPL-2.0</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/wwwlicious/servicestack-discovery-consul</PackageProjectUrl>

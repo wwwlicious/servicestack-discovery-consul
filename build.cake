@@ -96,6 +96,7 @@ Task("Build")
             .WithProperty("CodeContractsRunCodeAnalysis", "true")
             .WithProperty("RunCodeAnalysis", "false")
             .WithProperty("Version", semVersion)
+            .WithProperty("PackageVersion", gitVersionResults.MajorMinorPatch)
             .WithProperty("PackageOutputPath", MakeAbsolute(nugetPackageDir).FullPath)
             .UseToolVersion(MSBuildToolVersion.VS2017)
             .SetNodeReuse(false);
