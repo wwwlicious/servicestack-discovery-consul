@@ -95,7 +95,7 @@ Task("Build")
             .WithProperty("resultsAsErrors", "3884")
             .WithProperty("CodeContractsRunCodeAnalysis", "true")
             .WithProperty("RunCodeAnalysis", "false")
-            .WithProperty("VersionNumber", semVersion)
+            .WithProperty("version", semVersion)
             .WithProperty("PackageOutputPath", MakeAbsolute(nugetPackageDir).FullPath)
             .UseToolVersion(MSBuildToolVersion.VS2017)
             .SetNodeReuse(false);
