@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Copyright>Copyright © 2017</Copyright>
     <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
     <Configurations>Debug;Release</Configurations>
     <Title>ServiceStack.Discovery.Consul</Title>
@@ -24,27 +23,27 @@
     <IncludeSource>true</IncludeSource>
     <RepositoryUrl>https://github.com/wwwlicious/servicestack-discovery-consul</RepositoryUrl>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net452|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|net452'">
     <DefineConstants>TRACE;DEBUG;NET452;</DefineConstants>
     <DocumentationFile>bin\Debug\net452\ServiceStack.Discovery.Consul.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net452|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;NET452</DefineConstants>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|net452'">
+    <DefineConstants>NET452</DefineConstants>
     <DocumentationFile>bin\Release\net452\ServiceStack.Discovery.Consul.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|netstandard2.0'">
     <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0;</DefineConstants>
     <DocumentationFile>bin\Debug\netstandard2.0\ServiceStack.Discovery.Consul.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0</DefineConstants>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|netstandard2.0'">
+    <DefineConstants>NETSTANDARD2_0</DefineConstants>
     <DocumentationFile>bin\Release\netstandard2.0\ServiceStack.Discovery.Consul.xml</DocumentationFile>
   </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='net452'">
-    <PackageReference Include="ServiceStack.Server" Version="[4.5.8, 5)" />
+  <ItemGroup>
+    <PackageReference Include="ServiceStack.Server" Version="5.*" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
-    <PackageReference Include="ServiceStack.Server" Version="5.0.*" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.1.1" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Web" Condition="'$(TargetFramework)' == 'net452'" />

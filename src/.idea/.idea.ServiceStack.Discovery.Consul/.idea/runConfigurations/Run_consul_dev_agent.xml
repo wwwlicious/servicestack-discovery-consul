@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run consul dev agent" type="RunNativeExe" factoryName="Native Executable">
+    <option name="EXE_PATH" value="C:/Consul/consul.exe" />
+    <option name="PROGRAM_PARAMETERS" value="agent -dev -advertise=&quot;127.0.0.1&quot;" />
+    <option name="WORKING_DIRECTORY" value="C:/Consul" />
+    <option name="PASS_PARENT_ENVS" value="1" />
+    <option name="USE_EXTERNAL_CONSOLE" value="1" />
+    <method v="2">
+      <option name="Build Solution" enabled="true" />
+    </method>
+  </configuration>
+</component>

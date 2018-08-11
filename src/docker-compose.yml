@@ -1,8 +1,0 @@
-version: '3'
-
-services:
-  testserviceb:
-    image: testserviceb
-    build:
-      context: .
-      dockerfile: test\TestServiceB\Dockerfile
