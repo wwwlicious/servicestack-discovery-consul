@@ -78,7 +78,7 @@ consul.exe agent -dev -advertise="127.0.0.1"
 ```
 You should now be able see the [Consul Agent WebUI](http://127.0.0.1:8500/ui) link appear under **Plugins** on the metadata page.
 
-### Using the offical docker image
+### Using the official docker image
 
 ```bash
 docker pull consul
@@ -97,7 +97,7 @@ Once you have added the plugin to your ServiceStack AppHost and
 started it up, it will [self-register](http://microservices.io/patterns/self-registration.html):
 
 * AppHost.AfterInit - Registers the service and it's operations in the service registry.
-* AppHost.OnDispose - Deregisters the service when the AppHost is shutdown.
+* AppHost.OnDispose - Unregisters the service when the AppHost is shutdown.
 
 ### Health checks
 
@@ -166,9 +166,37 @@ new ConsulFeature(settings =>
 ```
 _http checks must be GET and the health check expects a 200 http status code_
 
-_tcp checks expect an ACK response_
+_tcp checks expect an ACK response.
 
 ### Discovery
+
+It is important to understand that in order to facilitate seamless service to service calls across different apphosts, 
+there are a few opinionated choices in how the plugin works with consul.
+
+Firstly, the only routing that is supported, is the default [pre-defined routes](http://docs.servicestack.net/routing#pre-defined-routes)
+
+The use of the [Service Gateway](http://docs.servicestack.net/service-gateway), also dictates that the 'IVerb' 
+[interface markers](http://docs.servicestack.net/csharp-client#http-verb-interface-markers) must be specified on the 
+DTO's in order to properly send the correct verb.
+
+Secondly, lookups are 'per DTO' type name - This enables the service, apphost or namespaces to change over time for a DTO endpoint. 
+By registering all DTO's in the same consul 'service', this allows seamless DNS and HTTP based lookups using only the DTO name.
+Each service or apphost will not be shown in consul as a separate entry but rather 'nodes' under a single 'api' service.  
+
+For this reason, it is expected that: 
+ * DTO names are not changed over time breaking the predefined routes.
+ * DTO names 'globally unique' in all discovery enabled apphosts to avoid DTO name collisions.
+
+Registering in this way allows for the most efficient lookup of the correct apphost for a DTO and also enables DNS queries
+to be consistent and 'guessable'.
+
+```bash
+# {dtoName}.{serviceName}.{type}.consul
+hellorequest.api.service.consul
+```
+
+Changing the service name per apphost, makes it impossible to simply query a consul datacenter in either http or dns for 
+the a dto's endpoint.   
 
 #### Excluding RequestDTO's
 
