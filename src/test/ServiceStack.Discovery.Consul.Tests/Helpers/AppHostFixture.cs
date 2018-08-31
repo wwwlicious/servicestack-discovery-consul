@@ -19,12 +19,14 @@ namespace ServiceStack.Discovery.Consul.Tests
                 new KeyValuePair<Type, string>(typeof (TestDto), typeof (TestDto).Name),
                 new KeyValuePair<Type, string>(typeof (TestDto2), typeof (TestDto2).Name)
             };
-            var plugins = new List<IPlugin>();
-            plugins.Add(new NativeTypesFeature());
-            plugins.Add(new ConsulFeature(settings =>
+            var plugins = new List<IPlugin>
             {
-                settings.AddServiceDiscovery(new TestServiceDiscovery(TestTypes));
-            }));
+                new NativeTypesFeature(),
+                new ConsulFeature(settings =>
+                {
+                    settings.AddServiceDiscovery(new TestServiceDiscovery(TestTypes));
+                })
+            };
 
             Host = new BasicAppHost
             {

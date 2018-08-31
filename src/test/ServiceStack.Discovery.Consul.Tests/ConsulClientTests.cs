@@ -46,7 +46,7 @@ namespace ServiceStack.Discovery.Consul.Tests
                   "No healthy services are currently registered to process the request of type 'three'")
                 .WithInnerException<WebServiceException>()
                 .WithMessage(
-                  "Expected json but received empty or null reponse from http://127.0.0.1:8500/v1/health/service/service?near=_agent&passing&tag=three");
+                  "Expected json but received empty or null response from http://127.0.0.1:8500/v1/health/service/service?near=_agent&passing&tag=three");
             }
         }
 

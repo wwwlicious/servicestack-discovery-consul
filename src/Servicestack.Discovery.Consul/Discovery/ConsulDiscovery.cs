@@ -48,7 +48,7 @@ namespace ServiceStack.Discovery.Consul
 
             try
             {
-                // register the service and healthchecks with consul
+                // register the service and health checks with consul
                 ConsulClient.RegisterService(registration);
                 var heathChecks = CreateHealthChecks(registration);
                 ConsulClient.RegisterHealthChecks(heathChecks);
@@ -57,7 +57,7 @@ namespace ServiceStack.Discovery.Consul
             }
             catch (Exception e)
             {
-                throw new GatewayServiceDiscoveryException($"Failed to register the service with consul agent {ConsulUris.LocalAgent}", e);
+                throw new GatewayServiceDiscoveryException($"Failed to register the service with consul agent {ConsulFeature.ConsulAgentResolver}", e);
             }
             
             // TODO Generate warnings if dto's have [Restrict(RequestAttributes.Secure)] 
@@ -66,7 +66,7 @@ namespace ServiceStack.Discovery.Consul
             // TODO for sorting by versioning to work, any registered version tag must be numeric
             // option 1: use ApiVersion but throw exception to stop host if it is not numeric
             // option 2: use a dedicated numeric version property which defaults to 1.0
-            // option 3: use the appost's assembly version
+            // option 3: use the apphost's assembly version
             //var version = "v{0}".Fmt(host.Config?.ApiVersion?.Replace('.', '-'));
 
             // assign if self-registration was successful

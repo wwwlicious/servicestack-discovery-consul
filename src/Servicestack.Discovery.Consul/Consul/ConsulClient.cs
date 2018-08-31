@@ -34,33 +34,30 @@ namespace ServiceStack.Discovery.Consul
 
             ServiceValidator.ValidateAndThrow(consulServiceRegistration);
 
-            var registrationUrl = ConsulUris.LocalAgent.CombineWith(consulServiceRegistration.ToPutUrl());
+            var registrationUrl = ConsulFeature.ConsulAgentResolver.CombineWith(consulServiceRegistration.ToPutUrl());
             registrationUrl.PutJsonToUrl(consulServiceRegistration, null,
                 response =>
                 {
                     var logger = LogManager.GetLogger(typeof(ConsulClient));
                     if (response.StatusCode.IsErrorResponse())
                     {
-                        logger.Fatal(
-                            $"Could not register appHost with Consul. It will not be discoverable: {consulServiceRegistration}");
+                        logger.Fatal($"Could not register appHost with Consul. It will not be discoverable: {consulServiceRegistration}");
                         throw new GatewayServiceDiscoveryException("Failed to register service with consul");
                     }
                     else
                     {
                         logger.Info($"Registered service with Consul {consulServiceRegistration}");
-                        AppDomain.CurrentDomain.ProcessExit +=
-                            (sender, args) => UnregisterService(consulServiceRegistration.ID);
-                        AppDomain.CurrentDomain.UnhandledException +=
-                            (sender, args) => UnregisterService(consulServiceRegistration.ID);
+                        AppDomain.CurrentDomain.ProcessExit += (sender, args) => UnregisterService(consulServiceRegistration.ID);
+                        AppDomain.CurrentDomain.UnhandledException += (sender, args) => UnregisterService(consulServiceRegistration.ID);
                     }
                 });
         }
 
         /// <summary>
-        /// Removes a service registation (and it's associated health checks) from consul
+        /// Removes a service registration (and it's associated health checks) from consul
         /// </summary>
         /// <param name="serviceId">the id of the service to unregister</param>
-        /// <exception cref="GatewayServiceDiscoveryException">throws exception if unregistration was not successful</exception>
+        /// <exception cref="GatewayServiceDiscoveryException">throws exception if unregistering was not successful</exception>
         public static void UnregisterService(string serviceId)
         {
             ConsulUris.DeregisterService(serviceId).GetJsonFromUrl(
@@ -93,7 +90,7 @@ namespace ServiceStack.Discovery.Consul
 
                 if (string.IsNullOrWhiteSpace(response))
                     throw new WebServiceException(
-                        $"Expected json but received empty or null reponse from {ConsulUris.GetServices(serviceName)}");
+                        $"Expected json but received empty or null response from {ConsulUris.GetServices(serviceName)}");
 
                 return GetConsulServiceResponses(response);
             }
@@ -123,7 +120,7 @@ namespace ServiceStack.Discovery.Consul
             {
                 var response = healthUri.GetJsonFromUrl();
                 if (string.IsNullOrWhiteSpace(response))
-                    throw new WebServiceException($"Expected json but received empty or null reponse from {healthUri}");
+                    throw new WebServiceException($"Expected json but received empty or null response from {healthUri}");
 
                 return GetConsulServiceResponses(response).First();
             }
@@ -159,7 +156,7 @@ namespace ServiceStack.Discovery.Consul
                     HealthcheckValidator.ValidateAndThrow(consulCheck);
 
                     var registerUrl = consulCheck.ToPutUrl();
-                    ConsulUris.LocalAgent.CombineWith(registerUrl).PutJsonToUrl(
+                    ConsulFeature.ConsulAgentResolver.CombineWith(registerUrl).PutJsonToUrl(
                         consulCheck,
                         null,
                         response =>
