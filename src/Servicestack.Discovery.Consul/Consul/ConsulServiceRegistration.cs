@@ -10,7 +10,7 @@ namespace ServiceStack.Discovery.Consul
     {
         public ConsulServiceRegistration(string id, string name)
         {
-            // ID must be unique, otherwise service registraions are overwritten
+            // ID must be unique, otherwise service registrations are overwritten
             ID = id;
             Name = name;
         }

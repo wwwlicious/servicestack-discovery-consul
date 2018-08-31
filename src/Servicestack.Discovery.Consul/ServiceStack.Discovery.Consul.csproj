@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
     <Configurations>Debug;Release</Configurations>
     <Title>ServiceStack.Discovery.Consul</Title>
     <Description>ServiceStack plugin that supports service discovery and request uri resolution using Consul</Description>
@@ -20,17 +20,15 @@
     <PackageIconUrl>https://servicestack.net/img/logo-32.png</PackageIconUrl>
     <ReleaseNotes>https://github.com/wwwlicious/servicestack-discovery-consul/releases</ReleaseNotes>
     <PackageTags>servicestack plugin discovery gateway servicediscovery microservices consul</PackageTags>
-    <IncludeSymbols>true</IncludeSymbols>
-    <IncludeSource>true</IncludeSource>
     <RepositoryUrl>https://github.com/wwwlicious/servicestack-discovery-consul</RepositoryUrl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|net452'">
-    <DefineConstants>TRACE;DEBUG;NET452;</DefineConstants>
-    <DocumentationFile>bin\Debug\net452\ServiceStack.Discovery.Consul.xml</DocumentationFile>
+    <DefineConstants>TRACE;DEBUG;NET45;</DefineConstants>
+    <DocumentationFile>bin\Debug\net45\ServiceStack.Discovery.Consul.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|net452'">
-    <DefineConstants>NET452</DefineConstants>
-    <DocumentationFile>bin\Release\net452\ServiceStack.Discovery.Consul.xml</DocumentationFile>
+    <DefineConstants>NET45</DefineConstants>
+    <DocumentationFile>bin\Release\net45\ServiceStack.Discovery.Consul.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|netstandard2.0'">
     <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0;</DefineConstants>
@@ -41,9 +39,10 @@
     <DocumentationFile>bin\Release\netstandard2.0\ServiceStack.Discovery.Consul.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ServiceStack.Server" Version="5.0.0" />
+    <PackageReference Include="GitLink" Version="3.1.0" PrivateAssets="All" />
+    <PackageReference Include="ServiceStack.Server" Version="5.*" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="System.Web" Condition="'$(TargetFramework)' == 'net452'" />
+    <Reference Include="System.Web" Condition="'$(TargetFramework)' == 'net45'" />
   </ItemGroup>
 </Project>

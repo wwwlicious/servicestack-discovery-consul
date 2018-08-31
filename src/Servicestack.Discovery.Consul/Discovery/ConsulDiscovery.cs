@@ -6,6 +6,7 @@ namespace ServiceStack.Discovery.Consul
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Net;
     using ServiceStack.Logging;
     using ServiceStack.Redis;
 
@@ -176,7 +177,7 @@ namespace ServiceStack.Discovery.Consul
                 ServiceId = serviceId,
                 IntervalInSeconds = customHealthCheck.IntervalInSeconds,
                 DeregisterCriticalServiceAfterInMinutes = customHealthCheck.DeregisterIfCriticalAfterInMinutes,
-                Http = baseUrl.CombineWith("/json/reply/healthcheck"),
+                Http = baseUrl.CombineWith(new HealthCheck().ToGetUrl()),
                 Notes = "This check is an HTTP GET request which expects the service to return 200 OK"
             };
         }
@@ -195,12 +196,15 @@ namespace ServiceStack.Discovery.Consul
                 {
                     if (redisClient != null)
                     {
+                        var host = Dns.GetHostEntry(redisClient.Host);
+                        var ip = host.AddressList.First(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+                        
                         var redisHealthCheck = new ServiceHealthCheck
                         {
                             Id = "SS-Redis",
                             ServiceId = serviceId,
                             IntervalInSeconds = 10,
-                            Tcp = $"{redisClient.Host}:{redisClient.Port}",
+                            Tcp = $"{ip}:{redisClient.Port}",
                             Notes = "This check ensures that redis is responding correctly"
                         };
                         return redisHealthCheck;
@@ -225,7 +229,7 @@ namespace ServiceStack.Discovery.Consul
                 Id = "SS-Heartbeat",
                 ServiceId = serviceId,
                 IntervalInSeconds = 30,
-                Http = baseUrl.CombineWith("/json/reply/heartbeat"),
+                Http = baseUrl.CombineWith(new Heartbeat().ToGetUrl()),
                 Notes = "A heartbeat service to check if the service is reachable, expects 200 response",
                 DeregisterCriticalServiceAfterInMinutes = 90
             };

@@ -1,10 +1,13 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="src\demo\TestServiceB" type="DotNetProject" factoryName=".NET Project">
-    <option name="EXE_PATH" value="$PROJECT_DIR$/test/TestServiceB/bin/Debug/netcoreapp2.0/TestServiceB.dll" />
+    <option name="EXE_PATH" value="$PROJECT_DIR$/test/TestServiceB/bin/Debug/netcoreapp2.1/TestServiceB.dll" />
     <option name="PROGRAM_PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test/TestServiceB" />
     <option name="PASS_PARENT_ENVS" value="1" />
-    <option name="USE_EXTERNAL_CONSOLE" value="1" />
+    <envs>
+      <env name="ASPNETCORE_ENVIRONMENT" value="Development;ASPNETCORE_URLS=http://localhost:5000" />
+    </envs>
+    <option name="USE_EXTERNAL_CONSOLE" value="0" />
     <option name="USE_MONO" value="0" />
     <option name="RUNTIME_ARGUMENTS" value="" />
     <option name="PROJECT_PATH" value="$PROJECT_DIR$/test/TestServiceB/TestServiceB.csproj" />
@@ -12,7 +15,7 @@
     <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
     <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
     <option name="PROJECT_KIND" value="DotNetCore" />
-    <option name="PROJECT_TFM" value=".NETCoreApp,Version=v2.0" />
+    <option name="PROJECT_TFM" value=".NETCoreApp,Version=v2.1" />
     <method v="2">
       <option name="Build" enabled="true" />
     </method>
