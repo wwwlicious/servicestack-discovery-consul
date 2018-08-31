@@ -3,9 +3,12 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/. 
 namespace ServiceStack.Discovery.Consul.Tests
 {
+    using System;
     using FluentAssertions;
+    using ServiceStack.Testing;
     using Xunit;
 
+    [Collection("AppHost")]
     public class ConsulUrisTests
     {
         [Fact]

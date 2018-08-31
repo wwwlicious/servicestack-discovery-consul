@@ -10,6 +10,7 @@ namespace ServiceStack.Discovery.Consul
     using ServiceStack;
     using FluentValidation;
     using Logging;
+    using ServiceStack.Text;
 
     /// <summary>
     /// Consul client deals with consul api calls
@@ -25,75 +26,84 @@ namespace ServiceStack.Discovery.Consul
         /// <exception cref="GatewayServiceDiscoveryException">throws exception if registration was not successful</exception>
         public static void RegisterService(ServiceRegistration registration)
         {
-            var consulServiceRegistration = new ConsulServiceRegistration(registration.Id, registration.Name)
-                                   {
-                                        Address = registration.Address,
-                                        Tags = registration.Tags,
-                                        Port = registration.Port
-                                   };
+            var consulServiceRegistration =
+                new ConsulServiceRegistration(registration.Id, registration.Name)
+                {
+                    Address = registration.Address,
+                    Tags = registration.Tags,
+                    Port = registration.Port
+                };
 
             ServiceValidator.ValidateAndThrow(consulServiceRegistration);
 
-            var registrationUrl = ConsulUris.LocalAgent.CombineWith(consulServiceRegistration.ToPutUrl());
-            registrationUrl.PutJsonToUrl(consulServiceRegistration, null,
-                response =>
-                {
-                    var logger = LogManager.GetLogger(typeof(ConsulClient));
-                    if (response.StatusCode.IsErrorResponse())
+            var registrationUrl = ConsulFeature.ConsulAgentResolver.CombineWith(consulServiceRegistration.ToPutUrl());
+            using (var config = JsConfig.BeginScope())
+            {
+                config.EmitCamelCaseNames = false;
+                config.IncludeNullValues = false;
+                registrationUrl.PutJsonToUrl(consulServiceRegistration, null,
+                    response =>
                     {
-                        logger.Fatal(
-                            $"Could not register appHost with Consul. It will not be discoverable: {consulServiceRegistration}");
-                        throw new GatewayServiceDiscoveryException("Failed to register service with consul");
-                    }
-                    else
-                    {
-                        logger.Info($"Registered service with Consul {consulServiceRegistration}");
-                        AppDomain.CurrentDomain.ProcessExit +=
-                            (sender, args) => UnregisterService(consulServiceRegistration.ID);
-                        AppDomain.CurrentDomain.UnhandledException +=
-                            (sender, args) => UnregisterService(consulServiceRegistration.ID);
-                    }
-                });
+                        var logger = LogManager.GetLogger(typeof(ConsulClient));
+                        if (response.StatusCode.IsErrorResponse())
+                        {
+                            logger.Fatal(
+                                $"Could not register appHost with Consul. It will not be discoverable: {consulServiceRegistration}");
+                            throw new GatewayServiceDiscoveryException(
+                                "Failed to register service with consul");
+                        }
+                        else
+                        {
+                            logger.Info(
+                                $"Registered service with Consul {consulServiceRegistration}");
+                            AppDomain.CurrentDomain.ProcessExit += (sender, args) =>
+                                UnregisterService(consulServiceRegistration.ID);
+                            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+                                UnregisterService(consulServiceRegistration.ID);
+                        }
+                    });
+            }
         }
 
+
         /// <summary>
-        /// Removes a service registation (and it's associated health checks) from consul
+        /// Removes a service registration (and it's associated health checks) from consul
         /// </summary>
         /// <param name="serviceId">the id of the service to unregister</param>
-        /// <exception cref="GatewayServiceDiscoveryException">throws exception if unregistration was not successful</exception>
+        /// <exception cref="GatewayServiceDiscoveryException">throws exception if unregistering was not successful</exception>
         public static void UnregisterService(string serviceId)
         {
             ConsulUris.DeregisterService(serviceId).GetJsonFromUrl(
                 null,
                 response =>
+                {
+                    var logger = LogManager.GetLogger(typeof(ConsulClient));
+                    if (response.StatusCode != HttpStatusCode.OK)
                     {
-                        var logger = LogManager.GetLogger(typeof(ConsulClient));
-                        if (response.StatusCode != HttpStatusCode.OK)
-                        {
-                            logger.Error($"Consul failed to unregister service `{serviceId}`");
-                            throw new GatewayServiceDiscoveryException($"Failed to unregister service: {serviceId}");
-                        }
-                        else
-                        {
-                            logger.Debug($"Consul unregistered service: {serviceId}");
-                        }
-                    });
+                        logger.Error($"Consul failed to unregister service `{serviceId}`");
+                        throw new GatewayServiceDiscoveryException(
+                            $"Failed to unregister service: {serviceId}");
+                    }
+
+                    logger.Debug($"Consul unregistered service: {serviceId}");
+                });
         }
+
 
         /// <summary>
         /// Returns a list of catalog services and tags
         /// </summary>
         /// <returns>service id's and tags</returns>
         /// <exception cref="GatewayServiceDiscoveryException">throws exception if unable to get services</exception>
-        public static ConsulServiceResponse[] GetServices(string serviceName)
+        public static ConsulServiceResponse[] GetServices(string tagName)
         {
             try
             {
-                var response = ConsulUris.GetServices(serviceName).GetJsonFromUrl();
+                var response = ConsulUris.GetServices(tagName).GetJsonFromUrl();
 
                 if (string.IsNullOrWhiteSpace(response))
                     throw new WebServiceException(
-                        $"Expected json but received empty or null reponse from {ConsulUris.GetServices(serviceName)}");
+                        $"Expected json but received empty or null response from {ConsulUris.GetServices(tagName)}");
 
                 return GetConsulServiceResponses(response);
             }
@@ -123,7 +133,7 @@ namespace ServiceStack.Discovery.Consul
             {
                 var response = healthUri.GetJsonFromUrl();
                 if (string.IsNullOrWhiteSpace(response))
-                    throw new WebServiceException($"Expected json but received empty or null reponse from {healthUri}");
+                    throw new WebServiceException($"Expected json but received empty or null response from {healthUri}");
 
                 return GetConsulServiceResponses(response).First();
             }
@@ -158,22 +168,28 @@ namespace ServiceStack.Discovery.Consul
                     };
                     HealthcheckValidator.ValidateAndThrow(consulCheck);
 
-                    var registerUrl = consulCheck.ToPutUrl();
-                    ConsulUris.LocalAgent.CombineWith(registerUrl).PutJsonToUrl(
-                        consulCheck,
-                        null,
-                        response =>
-                        {
-                            if (response.IsErrorResponse())
+                    using (var config = JsConfig.BeginScope())
+                    {
+                        config.EmitCamelCaseNames = false;
+                        config.IncludeNullValues = false;
+                        
+                        ConsulFeature.ConsulAgentResolver.CombineWith(consulCheck.ToPutUrl()).PutJsonToUrl(
+                            consulCheck,
+                            null,
+                            response =>
                             {
-                                logger.Error(
-                                    $"Could not register health check ${check.Id} with Consul. {response.StatusDescription}");
-                            }
-                            else
-                            {
-                                logger.Info($"Registered health check with Consul `{check.Id}`");
-                            }
-                        });
+                                if (response.IsErrorResponse())
+                                {
+                                    logger.Error(
+                                        $"Could not register health check ${check.Id} with Consul. {response.StatusDescription}");
+                                }
+                                else
+                                {
+                                    logger.Info(
+                                        $"Registered health check with Consul `{check.Id}`");
+                                }
+                            });
+                    }
                 }
                 catch (Exception ex)
                 {

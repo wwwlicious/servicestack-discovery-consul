@@ -12,7 +12,7 @@ namespace ServiceStack.Discovery.Consul
     public class ConsulFeatureSettings
     {
         /// <summary>
-        /// Prefix used when registering and looking up requestDTO's
+        /// Prefix used when registering and looking up request DTO's
         /// </summary>
         public const string GlobalServiceName = "servicestack";
 
@@ -30,6 +30,8 @@ namespace ServiceStack.Discovery.Consul
         /// Set to false to exclude adding the default health checks on service registration
         /// </summary>
         public bool IncludeDefaultServiceHealth { get; set; } = true;
+
+        public string ConsulAgentUrl { get; set; } = ConsulUris.LocalAgent;
         
         /// <summary>
         /// Add custom service tags to your service registration

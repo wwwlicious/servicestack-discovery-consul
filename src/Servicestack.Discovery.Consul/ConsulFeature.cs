@@ -26,6 +26,9 @@ namespace ServiceStack.Discovery.Consul
             Settings = new ConsulFeatureSettings();
             settings?.Invoke(Settings);
         }
+
+
+        public static string ConsulAgentResolver => HostContext.GetPlugin<ConsulFeature>().Settings.ConsulAgentUrl;
       
         public void Register(IAppHost appHost)
         {
@@ -42,7 +45,7 @@ namespace ServiceStack.Discovery.Consul
             appHost.RegisterService<DiscoveryService>();
 
             // register plugin link
-            appHost.GetPlugin<MetadataFeature>()?.AddPluginLink(ConsulUris.LocalAgent.CombineWith("ui"), "Consul Agent WebUI");
+            appHost.GetPlugin<MetadataFeature>()?.AddPluginLink(Settings.ConsulAgentUrl.CombineWith("ui"), "Consul Agent WebUI");
         }
 
         private void RegisterService(IAppHost host)
