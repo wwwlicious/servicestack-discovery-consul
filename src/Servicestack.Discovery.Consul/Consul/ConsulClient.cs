@@ -73,7 +73,8 @@ namespace ServiceStack.Discovery.Consul
         /// <exception cref="GatewayServiceDiscoveryException">throws exception if unregistering was not successful</exception>
         public static void UnregisterService(string serviceId)
         {
-            ConsulUris.DeregisterService(serviceId).GetJsonFromUrl(
+            ConsulUris.DeregisterService(serviceId).PutJsonToUrl(
+                null,
                 null,
                 response =>
                 {
