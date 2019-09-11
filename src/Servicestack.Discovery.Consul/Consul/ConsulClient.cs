@@ -37,10 +37,8 @@ namespace ServiceStack.Discovery.Consul
             ServiceValidator.ValidateAndThrow(consulServiceRegistration);
 
             var registrationUrl = ConsulFeature.ConsulAgentResolver.CombineWith(consulServiceRegistration.ToPutUrl());
-            using (var config = JsConfig.BeginScope())
+            using (JsConfig.With(new Config { TextCase = TextCase.Default, IncludeNullValues = false }))
             {
-                config.EmitCamelCaseNames = false;
-                config.IncludeNullValues = false;
                 registrationUrl.PutJsonToUrl(consulServiceRegistration, null,
                     response =>
                     {
@@ -169,11 +167,8 @@ namespace ServiceStack.Discovery.Consul
                     };
                     HealthcheckValidator.ValidateAndThrow(consulCheck);
 
-                    using (var config = JsConfig.BeginScope())
+                    using (JsConfig.With(new Config { TextCase = TextCase.Default, IncludeNullValues = false }))
                     {
-                        config.EmitCamelCaseNames = false;
-                        config.IncludeNullValues = false;
-                        
                         ConsulFeature.ConsulAgentResolver.CombineWith(consulCheck.ToPutUrl()).PutJsonToUrl(
                             consulCheck,
                             null,
